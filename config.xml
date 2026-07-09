@@ -10,11 +10,17 @@
     <content src="index.html" />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
-</widget>
 
-<icon src="icon.png" />
-
-<platform name="android">
     <icon src="icon.png" />
-</platform>
 
+    <platform name="android">
+        <icon src="icon.png" />
+    </platform>
+    
+</widget> ```
+
+---
+
+## ⚠️ 마지막 체크리스트
+* `icon.png` 파일이 `config.xml` 파일과 **같은 폴더(프로젝트 최상위 루트 폴더)**에 들어있는지 다시 한번 확인해 주세요. 
+* 파일 위치와 위 코드가 매핑되었다면 다시 터미널에서 빌드(`cordova build android`)를 돌리시면 정상적으로 통과됩니다!
