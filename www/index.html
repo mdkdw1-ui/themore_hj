@@ -233,7 +233,7 @@
             "RUB": { code: "RUB", name: "러시아 루블", symbol: "₽", rate_unit: 1, default: 14.50, continent: "EU_ME" },
             "TRY": { code: "TRY", name: "터키 리라", symbol: "₺", rate_unit: 1, default: 39.50, continent: "EU_ME" },
             "AED": { code: "AED", name: "UAE 디르함", symbol: "د.إ", rate_unit: 1, default: 367.00, continent: "EU_ME" },
-            "SAR": { code: "SAR", name: "사우디 리얄", symbol: "ر.스", rate_unit: 1, default: 359.00, continent: "EU_ME" },
+            "SAR": { code: "SAR", name: "사우디 리얄", symbol: "ر.س", rate_unit: 1, default: 359.00, continent: "EU_ME" },
             "KWD": { code: "KWD", name: "쿠웨이트 디나르", symbol: "د.ㅋ", rate_unit: 1, default: 4400.00, continent: "EU_ME" },
             "BHD": { code: "BHD", name: "바레인 디나르", symbol: ".د.배", rate_unit: 1, default: 3580.00, continent: "EU_ME" },
             "QAR": { code: "QAR", name: "카타르 리얄", symbol: "ر.기", rate_unit: 1, default: 370.00, continent: "EU_ME" },
@@ -501,15 +501,31 @@
             }
         }
   
+        // 🛠️ 신한 더모아 공식 해외결제 5단계 청구금액 정밀 수수료 계산식 연동
         function runExactThreeStepFormula(amtInput, info) { 
-            const brandApplied = amtInput * 1.011; 
-            const cardApplied = brandApplied * 1.0018; 
-            const finalRate = (rawNumericRate / info.rate_unit); 
-            return Math.floor(cardApplied * finalRate); 
+            // 1. 외화 결제 금액을 미 달러(USD) 순수 결제금액으로 전환 (USD 계열은 그대로 적용)
+            let usdAmount = amtInput;
+            if (info.code !== "USD") {
+                // (외화 현재 고유환율 / 외화 환율단위) 수치를 통해 USD 베이스 가격으로 정밀 역산
+                usdAmount = amtInput * (rawNumericRate / info.rate_unit) / globalCachedUsdTt;
+            }
+            
+            // 2. 국제 브랜드사 수수료 (1.1%) 반영 후 소수점 둘째 자리 반올림 (이용금액 센트 단위 확정)
+            const brandAppliedUsd = Math.round(usdAmount * 1.011 * 100) / 100; 
+            
+            // 3. 원화 환산 처리 (이용금액(USD) x 고유 적용환율, 원 단위 미만 무조건 절사)
+            const krwAmount = Math.floor(brandAppliedUsd * globalCachedUsdTt); 
+            
+            // 4. 신한카드 해외서비스 이용 수수료 (원화금액 x 0.18%, 원 단위 미만 무조건 절사)
+            const shinhanFee = Math.floor(krwAmount * 0.0018);
+            
+            // 5. 최종 합산 청구금액 출력
+            return krwAmount + shinhanFee; 
         }
         
         function formatForeignAmount(val, info) { if (val >= 1000 && (info.code === "IDR" || info.code === "VND" || info.code === "COP" || info.code === "CLP")) { return (val / 1000).toFixed(1) + "K"; } return val.toFixed(2); }
         
+        // 🛠️ 정밀 5단계 수수료 공식에 최적화된 최대 가이드라인 타겟 금액 역산 시스템
         function updateGuideTable() { 
             if (!rawNumericRate || isNaN(rawNumericRate) || rawNumericRate <= 0) return; 
             const info = getInfo(); 
@@ -517,10 +533,39 @@
             const targets = [5999, 6999, 7999, 8999, 9999]; 
             const gridContainer = document.getElementById("guide_grid"); 
             gridContainer.innerHTML = ""; 
-            const perUnitRate = (rawNumericRate / info.rate_unit); 
+            
             targets.forEach(tgt => { 
-                let targetForeign = tgt / (1.011 * 1.0018 * perUnitRate); 
+                // 수수료 및 절사 이력을 고려하여 안전한 타겟 USD 이용금액 탐색 루프 (안전 범위 확보)
+                let approxUsd = tgt / (1.0018 * globalCachedUsdTt);
+                let startUsdInt = Math.floor(approxUsd * 100) + 5;
+                let bestBrandAppliedUsd = 0;
+                
+                for (let u = startUsdInt; u > 0; u--) {
+                    let testUsd = u / 100;
+                    let krw = Math.floor(testUsd * globalCachedUsdTt);
+                    let fee = Math.floor(krw * 0.0018);
+                    if (krw + fee <= tgt) {
+                        bestBrandAppliedUsd = testUsd;
+                        break;
+                    }
+                }
+
+                // 국제 브랜드사 수수료(1.1% 반올림)를 역추적하여 최대 순수 USD 금액 상한선 산출
+                let maxUsdAmount = (bestBrandAppliedUsd + 0.0049) / 1.011;
+                
+                let targetForeign = maxUsdAmount;
+                if (info.code !== "USD") {
+                    targetForeign = maxUsdAmount * globalCachedUsdTt / (rawNumericRate / info.rate_unit);
+                }
+                
+                // 앱 입력 편의성용 소수점 둘째 자리 절사 가이드 제시
                 let adjustedVal = Math.floor(targetForeign * 100) / 100; 
+                
+                // 역산 오차 및 절사 경계값 예외 차단을 위한 마지막 미세 조정 서브 루프 검증
+                while (adjustedVal > 0 && runExactThreeStepFormula(adjustedVal, info) > tgt) {
+                    adjustedVal -= 0.01;
+                }
+                
                 let itemDiv = document.createElement("div"); 
                 itemDiv.className = "guide-item"; 
                 let displayAmtStr = formatForeignAmount(adjustedVal, info); 
