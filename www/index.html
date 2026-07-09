@@ -207,7 +207,6 @@
     <!-- Cordova 프레임워크 스크립트 연결 (빌드 시 자동 주입됨) -->
     <script src="cordova.js"></script>
     <script>
-        // 전세계 주요 40여개국 통화 마스터 맵 정의
         const GLOBAL_CURRENCY_MAP = {
             "USD": { code: "USD", name: "미국 달러", symbol: "$", rate_unit: 1, default: 1350.00, isMajor: true },
             "JPY": { code: "JPY", name: "일본 엔", symbol: "¥", rate_unit: 100, default: 890.00, isMajor: true },
@@ -220,7 +219,7 @@
             "VND": { code: "VND", name: "베트남 동", symbol: "₫", rate_unit: 100, default: 5.30, continent: "ASIA" },
             "AUD": { code: "AUD", name: "호주 달러", symbol: "A$", rate_unit: 1, default: 910.00, continent: "ASIA" },
             "NZD": { code: "NZD", name: "뉴질랜드 달러", symbol: "NZ$", rate_unit: 1, default: 810.00, continent: "ASIA" },
-            "PHP": { code: "PHP", name: "필리핀 페소", symbol: "₱", rate_unit: 1, default: 23.00, continent: "ASIA" },
+            "PHP": { code: "PHP", name: "필리핀 페소", symbol: "₱", rate_unit: 23.00, continent: "ASIA" },
             "MYR": { code: "MYR", name: "말레이시아 링깃", symbol: "RM", rate_unit: 1, default: 290.00, continent: "ASIA" },
             "IDR": { code: "IDR", name: "인도네시아 루피아", symbol: "Rp", rate_unit: 100, default: 8.50, continent: "ASIA" },
             "INR": { code: "INR", name: "인도 루피", symbol: "₹", rate_unit: 1, default: 16.00, continent: "ASIA" },
@@ -253,7 +252,6 @@
         let lastMainCurrency = "USD", lastSubContinent = "ALL", lastSubCurrency = "HKD", rawNumericRate = 0, systemViewMode = "NORMAL";
         let globalCachedUsdTt = 1350.00; 
         let currentVisaRatesMap = {}; 
-        let baseUsdHistory = [1350.00, 1348.00, 1345.00, 1352.00, 1349.00];
 
         const rateInput = document.getElementById("rate_input"), amountInput = document.getElementById("amount_input");
         amountInput.addEventListener("keydown", function(e) { if (e.key === "Enter") { e.preventDefault(); calculateBilling(); this.blur(); } });
@@ -292,7 +290,101 @@
             renderTrendList(); 
         }
         
-        function renderTrendList() { const container = document.getElementById("trend_list"); container.innerHTML = ""; let dateCursor = new Date(); let addedCount = 0; while(addedCount < 5) { let day = dateCursor.getDay(); if(day !== 0 && day !== 6) { let calculatedDayRate = baseUsdHistory[addedCount] || globalCachedUsdTt; let dateString = `${String(dateCursor.getMonth() + 1).padStart(2, '0')}/${String(dateCursor.getDate()).padStart(2, '0')}`; let row = document.createElement("div"); row.className = "trend-row"; row.innerHTML = `<span class="trend-date">${dateString}</span> <span class="trend-rate">${calculatedDayRate.toFixed(1)}원</span>`; container.appendChild(row); addedCount++; } dateCursor.setDate(dateCursor.getDate() - 1); } }
+        // 날짜 변환용 공통 KST 포맷 함수 ("YYYY-MM-DD")
+        function getParamDateStr(dateObj) {
+            const utc = dateObj.getTime() + (dateObj.getTimezoneOffset() * 60 * 1000);
+            const kstValue = new Date(utc + (9 * 60 * 60 * 1000));
+            const yyyy = kstValue.getFullYear();
+            const mm = String(kstValue.getMonth() + 1).padStart(2, '0');
+            const dd = String(kstValue.getDate()).padStart(2, '0');
+            return `${yyyy}-${mm}-${dd}`;
+        }
+
+        // 추세 리스트 렌더링 - 더모아 리얼 데이터 매핑 연동
+        function renderTrendList() { 
+            const container = document.getElementById("trend_list"); 
+            container.innerHTML = ""; 
+            let dateCursor = new Date(); 
+            let addedCount = 0; 
+            
+            let historyMap = {};
+            try { historyMap = JSON.parse(localStorage.getItem("themore_usd_history_map") || "{}"); } catch(e) {}
+
+            while(addedCount < 5) { 
+                let day = dateCursor.getDay(); 
+                if(day !== 0 && day !== 6) { 
+                    let ymd = getParamDateStr(dateCursor);
+                    let dateString = `${String(dateCursor.getMonth() + 1).padStart(2, '0')}/${String(dateCursor.getDate()).padStart(2, '0')}`; 
+                    
+                    let calculatedDayRate = historyMap[ymd];
+                    if (!calculatedDayRate) {
+                        // 최초 로딩 시 데이터 동기화 전 임시 비례 출력용 가이드
+                        calculatedDayRate = (addedCount === 0) ? globalCachedUsdTt : (globalCachedUsdTt - (addedCount * 1.5));
+                    }
+                    
+                    let row = document.createElement("div"); 
+                    row.className = "trend-row"; 
+                    row.innerHTML = `<span class="trend-date">${dateString}</span> <span class="trend-rate">${calculatedDayRate.toFixed(1)}원</span>`; 
+                    container.appendChild(row); 
+                    addedCount++; 
+                } 
+                dateCursor.setDate(dateCursor.getDate() - 1); 
+            } 
+        }
+
+        // 과거 5영업일 날짜의 진짜 환율 정보들을 순차 동기화 수집하는 완전 연동 스케줄러
+        function syncHistoricalTrendList() {
+            let dateCursor = new Date();
+            let historyMap = {};
+            try { historyMap = JSON.parse(localStorage.getItem("themore_usd_history_map") || "{}"); } catch(e) {}
+
+            function fetchNext(cursor, pendingCount) {
+                if (pendingCount >= 5) {
+                    localStorage.setItem("themore_usd_history_map", JSON.stringify(historyMap));
+                    renderTrendList();
+                    return;
+                }
+                let day = cursor.getDay();
+                if (day === 0 || day === 6) {
+                    let nextCursor = new Date(cursor.getTime());
+                    nextCursor.setDate(nextCursor.getDate() - 1);
+                    fetchNext(nextCursor, pendingCount);
+                    return;
+                }
+
+                let ymd = getParamDateStr(cursor);
+                // 오늘 실시간 데이터 갱신을 제외하고 이미 기기에 수집 이력이 존재하면 중복 API 요청 차단
+                if (historyMap[ymd] && ymd !== getParamDateStr(new Date())) {
+                    let nextCursor = new Date(cursor.getTime());
+                    nextCursor.setDate(nextCursor.getDate() - 1);
+                    fetchNext(nextCursor, pendingCount + 1);
+                    return;
+                }
+
+                let timeParam = `${ymd}T09`;
+                const nativeHeaders = { "sec-ch-ua-mobile": "?0", "User-Agent": "Mozilla/5.0 (TheMore HJ Android)" };
+                
+                cordova.plugin.http.sendRequest(`https://api.themore.app/api/v1/rate?date=${timeParam}`, {
+                    method: 'get', headers: nativeHeaders, timeout: 2.5
+                }, function(response) {
+                    try {
+                        const data = JSON.parse(response.data);
+                        const parsedRate = parseFloat(data?.sh?.usdkrw_tt_rate);
+                        if (!isNaN(parsedRate) && parsedRate > 500 && parsedRate < 2500) {
+                            historyMap[ymd] = parsedRate;
+                        }
+                    } catch(e) {}
+                    let nextCursor = new Date(cursor.getTime());
+                    nextCursor.setDate(nextCursor.getDate() - 1);
+                    fetchNext(nextCursor, pendingCount + 1);
+                }, function(err) {
+                    let nextCursor = new Date(cursor.getTime());
+                    nextCursor.setDate(nextCursor.getDate() - 1);
+                    fetchNext(nextCursor, pendingCount + 1);
+                });
+            }
+            fetchNext(dateCursor, 0);
+        }
       
         function getFormattedTheMoreTimeParam() {
             const now = new Date();
@@ -304,7 +396,6 @@
             return `${yyyy}-${mm}-${dd}T09`;
         }
 
-        // 환율 정보 파이프라인 (오프라인 선행 체크 및 예외처리 적용 구조)
         function syncRateLoader() { 
             const statusLbl = document.getElementById("status_lbl");
             const timeLbl = document.getElementById("time_lbl"); 
@@ -319,22 +410,21 @@
                 statusLbl.innerText = statusText;
                 timeLbl.innerText = timeText;
                 
-                let savedHistory = localStorage.getItem("themore_usd_history_list");
-                if (savedHistory) {
-                    baseUsdHistory = JSON.parse(savedHistory);
-                } else {
-                    baseUsdHistory = [rate, rate - 2, rate - 5, rate + 3, rate - 1];
-                }
-                if (baseUsdHistory[0] !== rate) {
-                    baseUsdHistory.unshift(rate);
-                    if (baseUsdHistory.length > 5) baseUsdHistory.pop();
-                    localStorage.setItem("themore_usd_history_list", JSON.stringify(baseUsdHistory));
+                // 오늘 날짜 맵 키 적용
+                let todayYmd = getParamDateStr(new Date());
+                let historyMap = {};
+                try { historyMap = JSON.parse(localStorage.getItem("themore_usd_history_map") || "{}"); } catch(e) {}
+                historyMap[todayYmd] = rate;
+                localStorage.setItem("themore_usd_history_map", JSON.stringify(historyMap));
+
+                // 정상 온라인 TheMore API 상태일 경우, 백그라운드 리얼 히스토리 연쇄 체인 작동 시작
+                if (statusText.indexOf("TheMore API") !== -1) {
+                    syncHistoricalTrendList();
                 }
 
                 extractRateFromActiveCache();
             };
 
-            // 0. 네트워크 오프라인 상태 점검 우선 처리
             if (!navigator.onLine || typeof cordova === "undefined" || !cordova.plugin || !cordova.plugin.http) {
                 const savedLastRate = localStorage.getItem("themore_last_usd_rate");
                 applyFinalRate(parseFloat(savedLastRate || 1350.00), "오프라인 내부저장소 값", "기준: 최신 캐시 적용", "var(--accent-pink)");
@@ -348,13 +438,11 @@
             const isWeekend = (day === 0 || day === 6);
             const isNight = (hour >= 0 && hour < 9);
 
-            // 시간 스케줄러 분기 작동
             if (isWeekend) {
                 runOpenErEngine("주말 계산식", 1.015);
             } else if (isNight) {
                 runOpenErEngine("야간 계산식", 1.012);
             } else {
-                // 평일 주간 정상 타임라인 -> Advanced HTTP (CORS 우회) 활용하여 themore.app 호출
                 const timeParam = getFormattedTheMoreTimeParam();
                 const nativeHeaders = { "sec-ch-ua-mobile": "?0", "User-Agent": "Mozilla/5.0 (TheMore HJ Android)" };
 
@@ -375,7 +463,6 @@
                             }
                             applyFinalRate(parsedRate, "동기화 성공 (TheMore API)", `기준: ${timeParam}`, "var(--accent-green)");
                         } else {
-                            // themore.app 온라인 호출 실패 시 -> open er 통신 장애 계산식 구조 진입
                             runOpenErEngine("통신 장애 계산식", 1.0095);
                         }
                     } catch(e) { 
@@ -408,7 +495,6 @@
                 }, function(err) { runFinalStorageRecovery(); });
             }
 
-            // 온라인 연산 최악의 장애상황 대비 최종 오프라인 복구 레이어
             function runFinalStorageRecovery() {
                 const savedLastRate = localStorage.getItem("themore_last_usd_rate");
                 applyFinalRate(parseFloat(savedLastRate || 1350.00), "통신 장애 내부저장소 값", "기준: 기기 내부 저장소", "var(--accent-red)");
