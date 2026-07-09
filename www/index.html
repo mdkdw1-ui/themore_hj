@@ -2,332 +2,521 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <!-- Cordova 환경에 맞춘 보안 정책 설정 (Native HTTP 통신 허용) -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; media-src *; img-src 'self' data: content:; connect-src *;">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>The More for HJ</title>
     <style>
         :root {
-            --bg-color: #f8f9fa;
-            --card-bg: #ffffff;
-            --text-main: #212529;
-            --text-sub: #6c757d;
-            --primary: #4f46e5;
-            --primary-light: #e0e7ff;
-            --danger: #ef4444;
-            --border: #e9ecef;
+            --bg-main: #0a0b16;
+            --bg-panel-top: #1b1e36; 
+            --bg-panel-bottom: #0b0c18;
+            --bg-input: #030409;
+            --text-main: #ffffff;
+            --text-muted: #6b7099;
+            --accent-blue-start: #2563eb;
+            --accent-blue-end: #1d4ed8;
+            --accent-green: #10b981;
+            --accent-red: #ff4d4d;
+            --accent-pink: #f472b6;
+            --panel-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
+            --card-border: 1px solid rgba(255, 255, 255, 0.08);
         }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-main); padding: 16px; display: flex; flex-direction: column; min-height: 100vh; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: -apple-system, BlinkMacSystemFont, "Malgun Gothic", sans-serif; margin: 0; padding: 0; }
+        body { background-color: var(--bg-main); color: var(--text-main); padding: 10px 12px 16px 12px; display: flex; flex-direction: column; gap: 10px; height: 100vh; overflow: hidden; }
         
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-        .header h1 { font-size: 1.4rem; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 8px; }
-        .header h1 img { width: 28px; height: 28px; object-fit: contain; }
+        .premium-panel { 
+            background: linear-gradient(145deg, var(--bg-panel-top) 0%, var(--bg-panel-bottom) 100%); 
+            border-radius: 14px; 
+            border: var(--card-border); 
+            box-shadow: var(--panel-shadow), inset 0 1px 2px rgba(255, 255, 255, 0.06); 
+            flex-shrink: 0; 
+        }
         
-        .mode-toggle { display: flex; background: var(--border); padding: 4px; border-radius: 8px; gap: 4px; margin-bottom: 12px; }
-        .mode-btn { flex: 1; border: none; padding: 8px; border-radius: 6px; font-size: 0.9rem; font-weight: 600; cursor: pointer; background: transparent; color: var(--text-sub); transition: all 0.2s; }
-        .mode-btn.active { background: var(--card-bg); color: var(--primary); boxShadow: 0 2px 4px rgba(0,0,0,0.05); }
-
-        .mid-notice { text-align: center; font-size: 0.85rem; color: var(--danger); font-weight: 600; margin-bottom: 16px; }
-
-        .card { background: var(--card-bg); border-radius: 12px; padding: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border: 1px solid var(--border); margin-bottom: 16px; }
-        .card-title { font-size: 1rem; font-weight: 700; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .header-bar { display: flex; justify-content: space-between; align-items: center; padding: 8px 14px; }
+        .header-title { font-size: 21px; font-weight: 900; letter-spacing: -0.8px; background: linear-gradient(135deg, #ff65a3 0%, #a855f7 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .header-logo { width: 36px; height: 36px; object-fit: cover; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 3px 10px rgba(0,0,0,0.5); }
         
-        .rate-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 0.9rem; }
-        .rate-item { display: flex; flex-direction: column; gap: 4px; }
-        .rate-label { font-size: 0.75rem; color: var(--text-sub); }
-        .rate-val { font-weight: 700; }
-
-        .calc-box { display: flex; flex-direction: column; gap: 12px; margin-top: 8px; }
-        .info-row { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: var(--bg-color); border-radius: 8px; }
-        .info-target { font-size: 1.1rem; font-weight: 700; color: var(--primary); }
-        .info-result { font-weight: 700; text-align: right; }
-        .info-sub { font-size: 0.75rem; color: var(--text-sub); margin-top: 2px; }
-
-        .history-section { flex: 1; display: flex; flex-direction: column; }
-        .history-list { display: flex; flex-direction: column; gap: 8px; overflow-y: auto; }
-        .history-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed var(--border); font-size: 0.9rem; }
-
-        /* 고폰트 모드 스타일 최적화 (2번 요구사항 반영) */
-        body.high-font { font-size: 1.15rem; }
-        body.high-font .info-target { font-size: 1.15rem; } /* 5999, 6999 정보칸 글씨 크기 약간 조절 */
-        body.high-font .info-row { padding: 8px 10px; } /* 간격 축소 */
-        body.high-font .history-list { overflow-y: visible; height: auto; max-height: none; } /* 내역 2줄 스크롤 없이 노출 */
-
-        .footer { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-sub); margin-top: auto; padding-top: 12px; }
+        .tabs { display: flex; border-radius: 10px; overflow: hidden; background: #080914; padding: 3px; border: 1px solid rgba(255, 255, 255, 0.04); flex-shrink: 0; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+        .tab-btn { flex: 1; padding: 8px; border: none; font-size: 14px; font-weight: bold; background: transparent; color: var(--text-muted); cursor: pointer; border-radius: 7px; transition: all 0.2s ease; }
+        .tab-btn.active { background: linear-gradient(135deg, var(--accent-blue-start), var(--accent-blue-end)); color: var(--text-main); box-shadow: 0 4px 10px rgba(29, 78, 216, 0.45); }
+        
+        .selector-row { display: flex; flex-direction: column; gap: 5px; width: 100%; position: relative; z-index: 999; flex-shrink: 0; }
+        .custom-select { position: relative; width: 100%; }
+        .select-trigger { width: 100%; padding: 8px 12px; background: linear-gradient(180deg, #ffffff 0%, #e6e9e3 100%); color: #0b0c13; border-radius: 9px; font-size: 15px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; cursor: pointer; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.45); user-select: none; white-space: nowrap; overflow: hidden; letter-spacing: -0.3px; border: 1px solid rgba(255, 255, 255, 0.25); }
+        .select-trigger::after { content: '▼'; font-size: 10px; color: #4b5563; margin-left: 6px; flex-shrink: 0; }
+        .select-trigger.disabled { background: #090a14; color: var(--text-muted); border: 1px solid rgba(255,255,255,0.02); cursor: not-allowed; box-shadow: none; pointer-events: none; }
+        .select-trigger.disabled::after { display: none; }
+        .select-options { display: none; position: absolute; top: 38px; left: 0; width: 100%; max-height: 240px; overflow-y: auto; background: rgba(6, 7, 15, 0.98); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.12); padding: 6px; z-index: 10000; box-shadow: 0 16px 40px rgba(0,0,0,0.8); }
+        .custom-select.active .select-options { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+        .option-item { padding: 9px 4px; font-size: 13px; font-weight: bold; color: #b4b7cf; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.04); border-radius: 7px; cursor: pointer; text-align: center; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; transition: all 0.15s ease; }
+        .option-item:active { background: rgba(255, 255, 255, 0.08); }
+        .option-item.selected { color: #ffffff; background: linear-gradient(135deg, var(--accent-blue-start), var(--accent-blue-end)); border-color: rgba(255, 255, 255, 0.2); box-shadow: 0 4px 10px rgba(0,0,0,0.35); }
+        
+        .panel { padding: 10px; display: flex; flex-direction: column; gap: 6px; }
+        .api-info-row { display: flex; justify-content: space-between; align-items: center; font-size: 11.5px; font-weight: bold; padding: 2px 4px; }
+        #status_lbl { color: var(--accent-green); white-space: nowrap; }
+        #time_lbl { color: var(--text-muted); white-space: nowrap; }
+        .field-row { display: grid; grid-template-columns: 1fr 76px; gap: 6px; align-items: center; }
+        
+        .input-box { display: flex; align-items: center; justify-content: center; background-color: var(--bg-input); border-radius: 8px; height: 40px; border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: inset 0 2px 6px rgba(0,0,0,0.7); overflow: hidden; }
+        .input-box input { width: 100%; background: transparent; border: none; outline: none; text-align: center; font-weight: bold; font-size: 16px; color: #ffffff; padding: 2px 0 0 0; }
+        .input-box input[readonly] { pointer-events: none; user-select: none; }
+        #rate_input { color: var(--accent-green); }
+        #amount_input { color: #e2e8f0; }
+        
+        .btn-action { height: 40px; border: none; border-radius: 7px; font-size: 14px; font-weight: bold; color: var(--text-main); cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 8px rgba(0,0,0,0.4); transition: opacity 0.2s; }
+        .btn-action:active { opacity: 0.8; }
+        .btn-refresh { background: linear-gradient(135deg, #374151, #1f2937); border: 1px solid rgba(255,255,255,0.06); }
+        .btn-calc { background: linear-gradient(135deg, var(--accent-blue-start), var(--accent-blue-end)); border: 1px solid rgba(255,255,255,0.06); }
+        
+        .result-container { 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            text-align: center; 
+            gap: 4px; 
+            padding: 12px 8px; 
+            background: linear-gradient(145deg, #161936 0%, #070812 100%);
+            border: 2px solid rgba(255, 77, 77, 0.35); 
+            border-radius: 14px;
+            width: 100%; 
+            overflow: hidden; 
+            box-shadow: var(--panel-shadow), inset 0 0 15px rgba(255, 77, 77, 0.08); 
+            flex-shrink: 0;
+        }
+        #final_res { font-size: 26px; font-weight: bold; color: var(--accent-red); text-shadow: 0 0 16px rgba(255, 77, 77, 0.4); white-space: nowrap; letter-spacing: -0.5px; }
+        #buffer_res { font-size: 18px; font-weight: bold; color: #ff6b6b; white-space: nowrap; letter-spacing: -0.3px; }
+        
+        .guide-panel { padding: 8px 12px; display: flex; gap: 10px; align-items: center; }
+        .guide-left-area { flex: 1.1; display: flex; flex-direction: column; min-width: 0; }
+        .guide-grid { display: flex; flex-direction: column; width: 100%; } 
+        .guide-item { display: grid; grid-template-columns: 65px 16px 1fr; align-items: center; font-size: 15.5px; font-weight: 800; color: var(--text-main); white-space: nowrap; line-height: 1.45; }
+        .guide-item span.arrow { text-align: center; color: var(--text-muted); font-size: 10px; }
+        .guide-item span.foreign { text-align: left; color: #e2e8f0; padding-left: 2px; }
+        
+        .guide-right-area { flex: 0.9; border-left: 1px solid rgba(255,255,255,0.08); padding-left: 12px; display: flex; flex-direction: column; justify-content: center; min-width: 0; }
+        .trend-title { font-size: 10.5px; color: var(--text-muted); margin-bottom: 3px; font-weight: bold; }
+        .trend-row { display: flex; justify-content: flex-start; font-size: 13.5px; font-weight: 700; color: #38bdf8; white-space: nowrap; gap: 8px; line-height: 1.4; }
+        .trend-rate { color: var(--accent-green); min-width: 50px; }
+        
+        .history-panel { display: flex; flex-direction: column; gap: 5px; flex: 1; min-height: 0; background: transparent; }
+        .history-header { display: flex; justify-content: space-between; align-items: center; padding: 0 2px; flex-shrink: 0; }
+        .history-panel h3 { font-size: 12px; color: #9ca3af; font-weight: bold; }
+        .history-subtext { font-size: 11px; color: var(--accent-pink); margin-left: auto; margin-right: 12px; font-weight: bold; } 
+        .clear-btn { background: none; border: none; color: var(--text-muted); font-size: 12px; cursor: pointer; font-weight: bold; }
+        
+        .log-box { background: linear-gradient(145deg, var(--bg-panel-top) 0%, var(--bg-panel-bottom) 100%); border-radius: 12px; padding: 8px 12px; font-size: 13.5px; font-weight: bold; color: #4b5563; flex: 1; overflow-y: auto; white-space: pre-line; line-height: 1.55; border: var(--card-border); box-shadow: var(--panel-shadow); }
+        .log-box::-webkit-scrollbar { width: 5px; }
+        .log-box::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 3px; }
+        .log-box.has-data { color: #38bdf8; }
+        
+        .mode-controller { position: fixed; bottom: 20px; right: 12px; display: flex; flex-direction: column; gap: 16px; z-index: 10005; }
+        .mode-arrow-btn { width: 48px; height: 48px; border-radius: 50%; background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.05); color: rgba(255, 255, 255, 0.2); font-size: 16px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3); transition: all 0.2s ease; }
+        .mode-arrow-btn.active { background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(29, 78, 216, 0.3)); color: #ffffff; border-color: rgba(59, 130, 246, 0.4); box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3), inset 0 1px 1px rgba(255,255,255,0.1); }
+        
+        body.large-font-mode { padding: 6px; gap: 4px; }
+        body.large-font-mode .tab-btn { font-size: 18px; padding: 10px; }
+        body.large-font-mode .select-trigger { font-size: 21px; height: 48px; }
+        body.large-font-mode .select-options { top: 44px; }
+        body.large-font-mode .option-item { font-size: 18px; padding: 12px 4px; }
+        body.large-font-mode .api-info-row { font-size: 13.5px; }
+        body.large-font-mode .field-row { grid-template-columns: 1fr 90px; }
+        body.large-font-mode .input-box { height: 48px; }
+        body.large-font-mode .input-box input { font-size: 22px; }
+        body.large-font-mode .btn-action { height: 48px; font-size: 18px; }
+        body.large-font-mode .result-container { order: 5; padding: 8px; border: 3px solid var(--accent-red); }
+        body.large-font-mode #final_res { font-size: 28px; } 
+        body.large-font-mode #buffer_res { font-size: 18px; }
+        body.large-font-mode .history-panel { order: 6; flex: 1.4; min-height: 110px; }
+        body.large-font-mode .history-header h3 { font-size: 15px; }
+        body.large-font-mode .clear-btn { font-size: 14px; }
+        body.large-font-mode .log-box { font-size: 17px !important; font-weight: 800 !important; color: #ffffff !important; padding: 8px; line-height: 1.45; }
+        body.large-font-mode .guide-panel { order: 7; flex: 0.7; display: block; padding: 6px 10px; }
+        body.large-font-mode .guide-right-area { display: none !important; }
+        body.large-font-mode .guide-item { grid-template-columns: 115px 45px 1fr; background: rgba(255, 255, 255, 0.02); border-radius: 6px; margin-bottom: 2px; }
+        body.large-font-mode .guide-item span { font-size: 19px !important; font-weight: 900 !important; }
+        body.large-font-mode .guide-item span.arrow { font-size: 15px; color: var(--text-muted); }
+        body.large-font-mode .guide-item span.foreign { color: var(--accent-green); font-size: 19px !important; }
     </style>
 </head>
 <body>
-
-    <div class="header">
-        <h1><img src="icon.png" alt="로고"> The More for HJ</h1>
-        <div id="network-badge" style="font-size:0.75rem; font-weight:bold; color:var(--primary);">온라인</div>
+    <div class="header-bar premium-panel">
+        <span class="header-title">The More for HJ</span>
+        <img src="icon.png" class="header-logo" alt="Logo">
     </div>
-
-    <!-- 상단 모드 스위치 -->
-    <div class="mode-toggle">
-        <button class="mode-btn active" id="btn-normal" onclick="setMode('normal')">일반 모드</button>
-        <button class="mode-btn" id="btn-high" onclick="setMode('high')">고폰트 모드</button>
+    
+    <div class="tabs">
+        <button id="tab_main" class="tab-btn active" onclick="switchTab('MAIN')">주요 통화</button>
+        <button id="tab_sub" class="tab-btn" onclick="switchTab('SUB')">기타 통화</button>
     </div>
-
-    <!-- 중간 문구 수정 (4번 요구사항 반영) -->
-    <div class="mid-notice">환율 변동폭 3% 고려</div>
-
-    <!-- 환율 정보 카드 -->
-    <div class="card">
-        <div class="card-title">
-            <span>실시간 환율 정보</span>
-            <span id="calc-formula-name" style="font-size:0.8rem; color:var(--danger);">데이터 로딩 중...</span>
+    
+    <div class="selector-row">
+        <div id="top_dropdown" class="custom-select">
+            <div id="top_trigger" class="select-trigger" onclick="toggleDropdown('top_dropdown', event)">선택</div>
+            <div id="top_options" class="select-options"></div>
         </div>
-        <div class="rate-info-grid">
-            <div class="rate-item"><span class="rate-label">매매기준율 (USD)</span><span class="rate-val" id="rate-base-usd">-</span></div>
-            <div class="rate-item"><span class="rate-label">적용환율 (USD)</span><span class="rate-val" id="rate-apply-usd">-</span></div>
-            <div class="rate-item"><span class="rate-label">매매기준율 (JPY)</span><span class="rate-val" id="rate-base-jpy">-</span></div>
-            <div class="rate-item"><span class="rate-label">적용환율 (JPY)</span><span class="rate-val" id="rate-apply-jpy">-</span></div>
+        <div id="bottom_dropdown" class="custom-select">
+            <div id="bottom_trigger" class="select-trigger" onclick="toggleDropdown('bottom_dropdown', event)">선택</div>
+            <div id="bottom_options" class="select-options"></div>
         </div>
     </div>
-
-    <!-- 목표가 계산 카드 -->
-    <div class="card">
-        <div class="card-title">더모아 최적 타겟 금액</div>
-        <div class="calc-box">
-            <div class="info-row">
-                <div>
-                    <div class="info-target">5,999원 송금 타겟</div>
-                    <div class="info-sub" id="sub-5999">기준 단가 적용 계산</div>
-                </div>
-                <div class="info-result" id="res-5999">-</div>
-            </div>
-            <div class="info-row">
-                <div>
-                    <div class="info-target">6,999원 송금 타겟</div>
-                    <div class="info-sub" id="sub-6999">기준 단가 적용 계산</div>
-                </div>
-                <div class="info-result" id="res-6999">-</div>
-            </div>
+    
+    <div class="panel premium-panel">
+        <div class="api-info-row"><span id="status_lbl">환율 엔진 준비 중...</span><span id="time_lbl">기준시: 동기화 대기</span></div>
+        <div class="field-row">
+            <div class="input-box"><input type="text" id="rate_input" readonly></div>
+            <button class="btn-action btn-refresh" onclick="syncRateLoader(); event.stopPropagation();">갱신</button>
+        </div>
+        <div class="field-row">
+            <div class="input-box"><input type="number" id="amount_input" placeholder="0.00" step="0.01"></div>
+            <button class="btn-action btn-calc" onclick="calculateBilling()">계산</button>
         </div>
     </div>
+    
+    <div class="result-container">
+        <div id="final_res">청구예정 : - 원</div>
+        <div id="buffer_res">~ - 원까지 고려</div>
+    </div>
+    
+    <div class="history-panel">
+        <div class="history-header">
+            <h3>내 최근 이용 기록</h3>
+            <span class="history-subtext" id="track_mode_lbl">환율 변동폭 3% 고려</span>
+            <button class="clear-btn" onclick="clearHistory()">삭제</button>
+        </div>
+        <div id="history_box" class="log-box"></div>
+    </div>
 
-    <!-- 내 이용 내역 (2, 3번 요구사항 반영) -->
-    <div class="card history-section">
-        <div class="card-title">내 이용 내역 (최근 2건)</div>
-        <div class="history-list" id="history-container">
-            <div style="color:var(--text-sub); font-size:0.85rem; text-align:center; padding:10px;">기록이 없습니다.</div>
+    <div class="guide-panel premium-panel">
+        <div class="guide-left-area">
+            <div id="guide_grid" class="guide-grid"></div>
+        </div>
+        <div class="guide-right-area">
+            <span class="trend-title">최근 추세 (USD)</span>
+            <div id="trend_list" class="trend-list"></div>
         </div>
     </div>
-
-    <!-- 하단 푸터 (5번 요구사항 반영) -->
-    <div class="footer">
-        <span id="sync-time">최근 동기화: -</span>
-        <span>USD 추세: <span id="usd-trend" style="font-weight:bold;">-</span></span>
+    
+    <div class="mode-controller">
+        <div id="mode_up" class="mode-arrow-btn" onclick="changeEngineMode('LARGE')">▲</div>
+        <div id="mode_down" class="mode-arrow-btn active" onclick="changeEngineMode('NORMAL')">▼</div>
     </div>
-
+    
+    <!-- Cordova 프레임워크 스크립트 연결 (빌드 시 자동 주입됨) -->
     <script src="cordova.js"></script>
     <script>
-        // 로컬 스토리지 기본 구조 정의 (0번 요구사항: 오프라인용 내부 저장소 값)
-        const DEFAULT_CACHE = {
-            usd: { base: 1350, apply: 1363.5 },
-            jpy: { base: 880, apply: 888.8 },
-            usdTrend: "정체",
-            updatedAt: "내부 기본값"
+        // 전세계 주요 40여개국 통화 마스터 맵 정의
+        const GLOBAL_CURRENCY_MAP = {
+            "USD": { code: "USD", name: "미국 달러", symbol: "$", rate_unit: 1, default: 1350.00, isMajor: true },
+            "JPY": { code: "JPY", name: "일본 엔", symbol: "¥", rate_unit: 100, default: 890.00, isMajor: true },
+            "EUR": { code: "EUR", name: "유럽 유로", symbol: "€", rate_unit: 1, default: 1450.00, isMajor: true },
+            "CNY": { code: "CNY", name: "중국 위안", symbol: "¥", rate_unit: 1, default: 185.00, isMajor: true },
+            "HKD": { code: "HKD", name: "홍콩 달러", symbol: "HK$", rate_unit: 1, default: 173.00, continent: "ASIA" },
+            "TWD": { code: "TWD", name: "대만 달러", symbol: "NT$", rate_unit: 1, default: 42.00, continent: "ASIA" },
+            "THB": { code: "THB", name: "태국 바트", symbol: "฿", rate_unit: 1, default: 38.00, continent: "ASIA" },
+            "SGD": { code: "SGD", name: "싱가포르 달러", symbol: "S$", rate_unit: 1, default: 1010.00, continent: "ASIA" },
+            "VND": { code: "VND", name: "베트남 동", symbol: "₫", rate_unit: 100, default: 5.30, continent: "ASIA" },
+            "AUD": { code: "AUD", name: "호주 달러", symbol: "A$", rate_unit: 1, default: 910.00, continent: "ASIA" },
+            "NZD": { code: "NZD", name: "뉴질랜드 달러", symbol: "NZ$", rate_unit: 1, default: 810.00, continent: "ASIA" },
+            "PHP": { code: "PHP", name: "필리핀 페소", symbol: "₱", rate_unit: 1, default: 23.00, continent: "ASIA" },
+            "MYR": { code: "MYR", name: "말레이시아 링깃", symbol: "RM", rate_unit: 1, default: 290.00, continent: "ASIA" },
+            "IDR": { code: "IDR", name: "인도네시아 루피아", symbol: "Rp", rate_unit: 100, default: 8.50, continent: "ASIA" },
+            "INR": { code: "INR", name: "인도 루피", symbol: "₹", rate_unit: 1, default: 16.00, continent: "ASIA" },
+            "MOP": { code: "MOP", name: "마카오 파타카", symbol: "MOP$", rate_unit: 1, default: 168.00, continent: "ASIA" },
+            "MVR": { code: "MVR", name: "몰디브 루피야", symbol: "Rf", rate_unit: 1, default: 88.00, continent: "ASIA" },
+            "GBP": { code: "GBP", name: "영국 파운드", symbol: "£", rate_unit: 1, default: 1710.00, continent: "EU_ME" },
+            "CHF": { code: "CHF", name: "스위스 프랑", symbol: "CHF", rate_unit: 1, default: 1510.00, continent: "EU_ME" },
+            "SEK": { code: "SEK", name: "스웨덴 크로나", symbol: "kr", rate_unit: 1, default: 128.00, continent: "EU_ME" },
+            "DKK": { code: "DKK", name: "덴마크 크로나", symbol: "kr", rate_unit: 1, default: 195.00, continent: "EU_ME" },
+            "NOK": { code: "NOK", name: "노르웨이 크로나", symbol: "kr", rate_unit: 1, default: 125.00, continent: "EU_ME" },
+            "RUB": { code: "RUB", name: "러시아 루블", symbol: "₽", rate_unit: 1, default: 14.50, continent: "EU_ME" },
+            "TRY": { code: "TRY", name: "터키 리라", symbol: "₺", rate_unit: 1, default: 39.50, continent: "EU_ME" },
+            "AED": { code: "AED", name: "UAE 디르함", symbol: "د.إ", rate_unit: 1, default: 367.00, continent: "EU_ME" },
+            "SAR": { code: "SAR", name: "사우디 리얄", symbol: "ر.스", rate_unit: 1, default: 359.00, continent: "EU_ME" },
+            "KWD": { code: "KWD", name: "쿠웨이트 디나르", symbol: "د.ㅋ", rate_unit: 1, default: 4400.00, continent: "EU_ME" },
+            "BHD": { code: "BHD", name: "바레인 디나르", symbol: ".د.배", rate_unit: 1, default: 3580.00, continent: "EU_ME" },
+            "QAR": { code: "QAR", name: "카타르 리얄", symbol: "ر.기", rate_unit: 1, default: 370.00, continent: "EU_ME" },
+            "ZAR": { code: "ZAR", name: "남아공 랜드", symbol: "R", rate_unit: 1, default: 74.00, continent: "EU_ME" },
+            "EGP": { code: "EGP", name: "이집트 파운드", symbol: "E£", rate_unit: 1, default: 28.00, continent: "EU_ME" },
+            "CAD": { code: "CAD", name: "캐나다 달러", symbol: "C$", rate_unit: 1, default: 990.00, continent: "AMERICA" },
+            "MXN": { code: "MXN", name: "멕시코 페소", symbol: "$", rate_unit: 1, default: 68.00, continent: "AMERICA" },
+            "BRL": { code: "BRL", name: "브라질 헤알", symbol: "R$", rate_unit: 1, default: 240.00, continent: "AMERICA" },
+            "CLP": { code: "CLP", name: "칠레 페소", symbol: "$", rate_unit: 1, default: 1.45, continent: "AMERICA" },
+            "COP": { code: "COP", name: "콜롬비아 페소", symbol: "$", rate_unit: 1, default: 0.33, continent: "AMERICA" },
+            "PEN": { code: "PEN", name: "페루 누에보솔", symbol: "S/.", rate_unit: 1, default: 360.00, continent: "AMERICA" }
         };
+        const CONTINENTS = { "ALL": "전체 대륙", "ASIA": "아시아 / 대양주", "EU_ME": "유럽 / 중동 / 아프리카", "AMERICA": "아메리카 전역" };
+        
+        let currentTab = "MAIN", historyLog = [], selectedCurrencyCode = "USD", selectedContinentCode = "ALL";
+        let lastMainCurrency = "USD", lastSubContinent = "ALL", lastSubCurrency = "HKD", rawNumericRate = 0, systemViewMode = "NORMAL";
+        let globalCachedUsdTt = 1350.00; 
+        let currentVisaRatesMap = {}; 
+        let baseUsdHistory = [1350.00, 1348.00, 1345.00, 1352.00, 1349.00];
 
-        let currentMode = 'normal';
-        let appData = JSON.parse(localStorage.getItem('themore_cache')) || DEFAULT_CACHE;
-
-        document.addEventListener('deviceready', onDeviceReady, false);
-
-        function onDeviceReady() {
-            initApp();
-        }
-
-        function initApp() {
-            checkNetworkStatus();
-            fetchDataEngine();
-            // 30분마다 자동 갱신 리로드
-            setInterval(fetchDataEngine, 30 * 60 * 1000);
-        }
-
-        function checkNetworkStatus() {
-            const badge = document.getElementById('network-badge');
-            if (navigator.onLine) {
-                badge.innerText = "온라인";
-                badge.style.color = "var(--primary)";
-            } else {
-                badge.innerText = "오프라인 모드";
-                badge.style.color = "var(--danger)";
-            }
-        }
-
-        // 핵심 데이터 가공 엔진 (0번 및 1번 요구사항 처리)
-        async function fetchDataEngine() {
-            checkNetworkStatus();
+        const rateInput = document.getElementById("rate_input"), amountInput = document.getElementById("amount_input");
+        amountInput.addEventListener("keydown", function(e) { if (e.key === "Enter") { e.preventDefault(); calculateBilling(); this.blur(); } });
+        
+        function saveAppState() { const state = { currentTab, selectedCurrencyCode, selectedContinentCode, lastMainCurrency, lastSubContinent, lastSubCurrency, systemViewMode, historyLog }; localStorage.setItem("themore_v23_state", JSON.stringify(state)); }
+        function loadAppState() { const saved = localStorage.getItem("themore_v23_state"); if (saved) { try { const state = JSON.parse(saved); currentTab = state.currentTab || "MAIN"; selectedCurrencyCode = state.selectedCurrencyCode || "USD"; selectedContinentCode = state.selectedContinentCode || "ALL"; lastMainCurrency = state.lastMainCurrency || "USD"; lastSubContinent = state.lastSubContinent || "ALL"; lastSubCurrency = state.lastSubCurrency || "HKD"; systemViewMode = state.systemViewMode || "NORMAL"; historyLog = state.historyLog || []; } catch (e) { console.error("세션 복원 에러", e); } } }
+        
+        function changeEngineMode(targetMode) { systemViewMode = targetMode; const bodyNode = document.body, upBtn = document.getElementById("mode_up"), downBtn = document.getElementById("mode_down"); if(targetMode === "LARGE") { bodyNode.classList.add("large-font-mode"); upBtn.classList.add("active"); downBtn.classList.remove("active"); } else { bodyNode.classList.remove("large-font-mode"); upBtn.classList.remove("active"); downBtn.classList.add("active"); } saveAppState(); renderHistory(); updateGuideTable(); }
+        function toggleDropdown(id, event) { event.stopPropagation(); const target = document.getElementById(id); if (target.querySelector('.select-trigger').classList.contains('disabled')) return; const isActive = target.classList.contains('active'); document.querySelectorAll('.custom-select').forEach(el => el.classList.remove('active')); if (!isActive) target.classList.add('active'); }
+        document.addEventListener('click', () => { document.querySelectorAll('.custom-select').forEach(el => el.classList.remove('active')); });
+        function getInfo() { return GLOBAL_CURRENCY_MAP[selectedCurrencyCode]; }
+        
+        function switchTab(tabName, isInitial = false) { currentTab = tabName; document.getElementById("tab_main").classList.toggle("active", tabName === "MAIN"); document.getElementById("tab_sub").classList.toggle("active", tabName === "SUB"); const bottomTrigger = document.getElementById("bottom_trigger"); if (tabName === "MAIN") { bottomTrigger.classList.add("disabled"); bottomTrigger.innerText = "하단 선택 항목 잠김 (주요통화 모드)"; if (!isInitial) selectedCurrencyCode = lastMainCurrency; renderMainCurrenciesTop(); } else { bottomTrigger.classList.remove("disabled"); if (!isInitial) { selectedContinentCode = lastSubContinent; selectedCurrencyCode = lastSubCurrency; } renderContinentTop(); updateSubCurrencyBottom(); } if (!isInitial) saveAppState(); }
+        function renderMainCurrenciesTop() { const container = document.getElementById("top_options"), trigger = document.getElementById("top_trigger"); container.innerHTML = ""; if(GLOBAL_CURRENCY_MAP[selectedCurrencyCode]) trigger.innerText = `${GLOBAL_CURRENCY_MAP[selectedCurrencyCode].name} (${selectedCurrencyCode})`; for (let code in GLOBAL_CURRENCY_MAP) { if(!GLOBAL_CURRENCY_MAP[code].isMajor) continue; let div = document.createElement("div"); div.className = "option-item" + (code === selectedCurrencyCode ? " selected" : ""); div.innerText = `${GLOBAL_CURRENCY_MAP[code].name} (${code})`; div.onclick = (e) => { e.stopPropagation(); selectedCurrencyCode = code; lastMainCurrency = code; trigger.innerText = `${GLOBAL_CURRENCY_MAP[code].name} (${code})`; document.getElementById("top_dropdown").classList.remove("active"); saveAppState(); extractRateFromActiveCache(); }; container.appendChild(div); } extractRateFromActiveCache(); }
+        function renderContinentTop() { const container = document.getElementById("top_options"), trigger = document.getElementById("top_trigger"); container.innerHTML = ""; trigger.innerText = CONTINENTS[selectedContinentCode]; for (let code in CONTINENTS) { let div = document.createElement("div"); div.className = "option-item" + (code === selectedContinentCode ? " selected" : ""); div.innerText = CONTINENTS[code]; div.onclick = (e) => { e.stopPropagation(); selectedContinentCode = code; lastSubContinent = code; trigger.innerText = CONTINENTS[code]; document.getElementById("top_dropdown").classList.remove("active"); saveAppState(); updateSubCurrencyBottom(); }; container.appendChild(div); } }
+        function updateSubCurrencyBottom() { const container = document.getElementById("bottom_options"), trigger = document.getElementById("bottom_trigger"); container.innerHTML = ""; let validList = []; for (let code in GLOBAL_CURRENCY_MAP) { const info = GLOBAL_CURRENCY_MAP[code]; if(info.isMajor) continue; if (selectedContinentCode === "ALL" || info.continent === selectedContinentCode) validList.push(info); } if (!validList.some(item => item.code === "USD") && validList.length > 0) { if (!validList.some(item => item.code === selectedCurrencyCode)) selectedCurrencyCode = validList[0].code; } lastSubCurrency = selectedCurrencyCode; if(GLOBAL_CURRENCY_MAP[selectedCurrencyCode]) trigger.innerText = `${GLOBAL_CURRENCY_MAP[selectedCurrencyCode].name} (${selectedCurrencyCode})`; validList.forEach(info => { let div = document.createElement("div"); div.className = "option-item" + (info.code === selectedCurrencyCode ? " selected" : ""); div.innerText = `${info.name} (${info.code})`; div.onclick = (e) => { e.stopPropagation(); selectedCurrencyCode = info.code; lastSubCurrency = info.code; trigger.innerText = `${info.name} (${info.code})`; document.getElementById("bottom_dropdown").classList.remove("active"); saveAppState(); extractRateFromActiveCache(); }; container.appendChild(div); }); extractRateFromActiveCache(); }
+        
+        function updateVisualRateDisplay() { const info = getInfo(); if(!info) return; rateInput.value = `${rawNumericRate.toFixed(2)}원 (${info.rate_unit}${info.code})`; }
+        
+        function extractRateFromActiveCache() { 
+            const info = getInfo(); 
+            if(!info) return; 
             
-            // 시간 모드 감지 (주말 및 0~9시 야간 감지)
+            if (info.code === "USD") { 
+                rawNumericRate = globalCachedUsdTt; 
+            } else if (currentVisaRatesMap && currentVisaRatesMap[info.code]) {
+                const crossRate = currentVisaRatesMap[info.code];
+                rawNumericRate = crossRate * globalCachedUsdTt * info.rate_unit;
+            } else if (globalCachedUsdTt && info.default) { 
+                rawNumericRate = (info.default / info.rate_unit) * (globalCachedUsdTt / 1350.00) * info.rate_unit; 
+            } else { 
+                rawNumericRate = info.default; 
+            } 
+            updateVisualRateDisplay(); 
+            updateGuideTable(); 
+            renderTrendList(); 
+        }
+        
+        function renderTrendList() { const container = document.getElementById("trend_list"); container.innerHTML = ""; let dateCursor = new Date(); let addedCount = 0; while(addedCount < 5) { let day = dateCursor.getDay(); if(day !== 0 && day !== 6) { let calculatedDayRate = baseUsdHistory[addedCount] || globalCachedUsdTt; let dateString = `${String(dateCursor.getMonth() + 1).padStart(2, '0')}/${String(dateCursor.getDate()).padStart(2, '0')}`; let row = document.createElement("div"); row.className = "trend-row"; row.innerHTML = `<span class="trend-date">${dateString}</span> <span class="trend-rate">${calculatedDayRate.toFixed(1)}원</span>`; container.appendChild(row); addedCount++; } dateCursor.setDate(dateCursor.getDate() - 1); } }
+      
+        function getFormattedTheMoreTimeParam() {
             const now = new Date();
-            const day = now.getDay(); // 0:일, 6:토
-            const hour = now.getHours();
+            const utc = now.getTime() + (now.getTimezoneOffset() * 60 * 1000);
+            const kstValue = new Date(utc + (9 * 60 * 60 * 1000));
+            const yyyy = kstValue.getFullYear();
+            const mm = String(kstValue.getMonth() + 1).padStart(2, '0');
+            const dd = String(kstValue.getDate()).padStart(2, '0');
+            return `${yyyy}-${mm}-${dd}T09`;
+        }
+
+        // 환율 정보 파이프라인 (오프라인 선행 체크 및 예외처리 적용 구조)
+        function syncRateLoader() { 
+            const statusLbl = document.getElementById("status_lbl");
+            const timeLbl = document.getElementById("time_lbl"); 
             
-            let timeFormulaName = "더모아 정석";
-            let useOpenER = false;
+            statusLbl.style.color = "var(--text-muted)";
+            statusLbl.innerText = "네이티브 엔진 가동...";
 
-            if (day === 0 || day === 6) {
-                timeFormulaName = "주말 계산식";
-                useOpenER = true;
-            } else if (hour >= 0 && hour < 9) {
-                timeFormulaName = "야간 계산식";
-                useOpenER = true;
-            }
+            const applyFinalRate = (rate, statusText, timeText, color) => {
+                globalCachedUsdTt = rate;
+                localStorage.setItem("themore_last_usd_rate", globalCachedUsdTt);
+                statusLbl.style.color = color;
+                statusLbl.innerText = statusText;
+                timeLbl.innerText = timeText;
+                
+                let savedHistory = localStorage.getItem("themore_usd_history_list");
+                if (savedHistory) {
+                    baseUsdHistory = JSON.parse(savedHistory);
+                } else {
+                    baseUsdHistory = [rate, rate - 2, rate - 5, rate + 3, rate - 1];
+                }
+                if (baseUsdHistory[0] !== rate) {
+                    baseUsdHistory.unshift(rate);
+                    if (baseUsdHistory.length > 5) baseUsdHistory.pop();
+                    localStorage.setItem("themore_usd_history_list", JSON.stringify(baseUsdHistory));
+                }
 
-            // 0. 오프라인인 경우 내부 저장소 값 최우선 할당
-            if (!navigator.onLine) {
-                renderData(appData, "오프라인 내부 식");
+                extractRateFromActiveCache();
+            };
+
+            // 0. 네트워크 오프라인 상태 점검 우선 처리
+            if (!navigator.onLine || typeof cordova === "undefined" || !cordova.plugin || !cordova.plugin.http) {
+                const savedLastRate = localStorage.getItem("themore_last_usd_rate");
+                applyFinalRate(parseFloat(savedLastRate || 1350.00), "오프라인 내부저장소 값", "기준: 최신 캐시 적용", "var(--accent-pink)");
                 return;
             }
 
-            // 온라인인 경우 조건별 API 트리거
-            try {
-                if (useOpenER) {
-                    // 주말 또는 야간 -> Open ER 기준 가져오기
-                    await fetchAndProcessOpenER(timeFormulaName);
-                } else {
-                    // 평일 주간 -> themore.app 우선 시도
-                    try {
-                        await fetchAndProcessTheMoreApp();
-                    } catch (err) {
-                        // themore.app 실패 시 통신 장애 계산식으로 전환
-                        await fetchAndProcessOpenER("통신 장애 계산식");
-                    }
-                }
-            } catch (globalErr) {
-                // 전역 에러 발생 시 최종 보루로 기존 내부 스토리지 데이터 출력
-                renderData(appData, "오프라인 캐시 식");
-            }
-        }
-
-        // themore.app 데이터 파싱 (5번 요구사항: USD 추세값 매핑 반영)
-        async function fetchAndProcessTheMoreApp() {
-            // 본 코도바 앱은 Advanced HTTP 플러그인을 사용하여 CORS를 자동 우회합니다.
-            return new Promise((resolve, reject) => {
-                cordova.plugin.http.get('https://themore.app/api/v1/exchange/today', {}, {}, function(response) {
-                    try {
-                        const res = JSON.parse(response.data);
-                        // 구조 정의에 맞춰 데이터 맵핑
-                        appData.usd.base = parseFloat(res.usd.base_rate);
-                        appData.usd.apply = parseFloat(res.usd.applied_rate);
-                        appData.jpy.base = parseFloat(res.jpy.base_rate);
-                        appData.jpy.apply = parseFloat(res.jpy.applied_rate);
-                        
-                        // 5번 반영: themore.app 내부 실제 추세 텍스트 분기 파싱 처리
-                        appData.usdTrend = res.usd.trend || (res.usd.rate_diff > 0 ? "상승 ↑" : "하락 ↓");
-                        appData.updatedAt = new Date().toLocaleTimeString();
-
-                        localStorage.setItem('themore_cache', JSON.stringify(appData));
-                        renderData(appData, "더모아 정석");
-                        resolve();
-                    } catch(e) { reject(e); }
-                }, function(error) { reject(error); });
-            });
-        }
-
-        // Open Exchange Rates 모사 및 보정 가공 처리 함수 (Open ER 대체 로직 구현)
-        async function fetchAndProcessOpenER(formulaLabel) {
-            return new Promise((resolve, reject) => {
-                // 자체 Open ER 대체 백업 API 파싱 엔진 작동
-                cordova.plugin.http.get('https://open.er-api.com/v6/latest/USD', {}, {}, function(response) {
-                    try {
-                        const res = JSON.parse(response.data);
-                        const krwRate = res.rates.KRW;
-                        const jpyRate = res.rates.JPY;
-
-                        // 환율 산출 및 적용 확률/전산 수수료 적용 분기 계산 (기본 1.03% 수수료 보정율 가산)
-                        let feeMultiplier = 1.0103; 
-                        if (formulaLabel === "주말 계산식") feeMultiplier = 1.015; // 주말 가중 위험율 추가
-                        if (formulaLabel === "야간 계산식") feeMultiplier = 1.012; // 야간 가중 위험율 추가
-
-                        appData.usd.base = krwRate;
-                        appData.usd.apply = krwRate * feeMultiplier;
-                        
-                        // 100엔 환산 보정 처리
-                        const rawJpy = (krwRate / jpyRate) * 100;
-                        appData.jpy.base = rawJpy;
-                        appData.jpy.apply = rawJpy * feeMultiplier;
-
-                        appData.updatedAt = new Date().toLocaleTimeString();
-                        
-                        localStorage.setItem('themore_cache', JSON.stringify(appData));
-                        renderData(appData, formulaLabel);
-                        resolve();
-                    } catch(e) { reject(e); }
-                }, function(error) { reject(error); });
-            });
-        }
-
-        // 데이터 렌더링 화면단 구현부 (1, 2, 3번 요구사항 완벽 가공 처리)
-        function renderData(data, formulaLabel) {
-            document.getElementById('calc-formula-name').innerText = formulaLabel;
+            const now = new Date();
+            const day = now.getDay(); 
+            const hour = now.getHours();
             
-            // 상단 그리드 바인딩
-            document.getElementById('rate-base-usd').innerText = data.usd.base.toFixed(2) + " 원";
-            document.getElementById('rate-apply-usd').innerText = data.usd.apply.toFixed(2) + " 원";
-            document.getElementById('rate-base-jpy').innerText = data.jpy.base.toFixed(2) + " 원";
-            document.getElementById('rate-apply-jpy').innerText = data.jpy.apply.toFixed(2) + " 원";
+            const isWeekend = (day === 0 || day === 6);
+            const isNight = (hour >= 0 && hour < 9);
 
-            // 1번 요구사항 해결: 일본 엔(JPY) 단위 계산 시 단가를 100으로 나누어 정밀 1엔 기준으로 분해 계산
-            const jpyPerOneUnit = data.jpy.apply / 100;
-
-            // 목표 외화 타겟량 역산 계산식
-            const target5999_USD = (5999 / data.usd.apply).toFixed(2);
-            const target6999_USD = (6999 / data.usd.apply).toFixed(2);
-            const target5999_JPY = (5999 / jpyPerOneUnit).toFixed(0);
-            const target6999_JPY = (6999 / jpyPerOneUnit).toFixed(0);
-
-            document.getElementById('res-5999').innerHTML = `${target5999_USD} USD<br><span style="font-size:0.85rem; color:var(--text-sub);">${target5999_JPY} JPY</span>`;
-            document.getElementById('res-6999').innerHTML = `${target6999_USD} USD<br><span style="font-size:0.85rem; color:var(--text-sub);">${target6999_JPY} JPY</span>`;
-
-            // 하단 상태바 매핑
-            document.getElementById('sync-time').innerText = "최근 동기화: " + data.updatedAt;
-            document.getElementById('usd-trend').innerText = data.usdTrend;
-
-            // 이용 내역 동적 렌더링 파트 (2번, 3번 전용 분기)
-            renderHistory(target5999_USD, target6999_USD);
-        }
-
-        function renderHistory(usd5, usd6) {
-            const container = document.getElementById('history-container');
-            
-            // 3번 반영: 고폰트 모드에서는 안내용 가공 수수료 문구를 생략 처리
-            const subTextInfo = (currentMode === 'high') ? "" : " (×1.03하여 나오는 변동폭까지 고려)";
-
-            container.innerHTML = `
-                <div class="history-item">
-                    <div><strong>해외 직구 결제 (5999 타겟)</strong><div style="font-size:0.75rem; color:var(--text-sub);">추천 결제선${subTextInfo}</div></div>
-                    <div style="text-align:right; font-weight:bold; color:var(--primary);">${usd5} 달러</div>
-                </div>
-                <div class="history-item" style="border:none;">
-                    <div><strong>해외 배대지 결제 (6999 타겟)</strong><div style="font-size:0.75rem; color:var(--text-sub);">추천 결제선${subTextInfo}</div></div>
-                    <div style="text-align:right; font-weight:bold; color:var(--primary);">${usd6} 달러</div>
-                </div>
-            `;
-        }
-
-        // 고폰트 / 일반 모드 변경 처리 스위칭 스크립트
-        function setMode(mode) {
-            currentMode = mode;
-            const btnNormal = document.getElementById('btn-normal');
-            const btnHigh = document.getElementById('btn-high');
-            
-            if (mode === 'high') {
-                document.body.classList.add('high-font');
-                btnHigh.classList.add('active');
-                btnNormal.classList.remove('active');
+            // 시간 스케줄러 분기 작동
+            if (isWeekend) {
+                runOpenErEngine("주말 계산식", 1.015);
+            } else if (isNight) {
+                runOpenErEngine("야간 계산식", 1.012);
             } else {
-                document.body.classList.remove('high-font');
-                btnNormal.classList.add('active');
-                btnHigh.classList.remove('active');
+                // 평일 주간 정상 타임라인 -> Advanced HTTP (CORS 우회) 활용하여 themore.app 호출
+                const timeParam = getFormattedTheMoreTimeParam();
+                const nativeHeaders = { "sec-ch-ua-mobile": "?0", "User-Agent": "Mozilla/5.0 (TheMore HJ Android)" };
+
+                cordova.plugin.http.sendRequest(`https://api.themore.app/api/v1/rate?date=${timeParam}`, {
+                    method: 'get', headers: nativeHeaders, timeout: 3.0
+                }, function(response) {
+                    try {
+                        const data = JSON.parse(response.data);
+                        const parsedRate = parseFloat(data?.sh?.usdkrw_tt_rate);
+                        
+                        if (!isNaN(parsedRate) && parsedRate > 500 && parsedRate < 2500) {
+                            if (data.visa && Array.isArray(data.visa)) {
+                                data.visa.forEach(item => {
+                                    if(item.currency && item.usdFxRate) {
+                                        currentVisaRatesMap[item.currency] = parseFloat(item.usdFxRate);
+                                    }
+                                });
+                            }
+                            applyFinalRate(parsedRate, "동기화 성공 (TheMore API)", `기준: ${timeParam}`, "var(--accent-green)");
+                        } else {
+                            // themore.app 온라인 호출 실패 시 -> open er 통신 장애 계산식 구조 진입
+                            runOpenErEngine("통신 장애 계산식", 1.0095);
+                        }
+                    } catch(e) { 
+                        runOpenErEngine("통신 장애 계산식", 1.0095); 
+                    }
+                }, function(err) { 
+                    runOpenErEngine("통신 장애 계산식", 1.0095); 
+                });
             }
-            // 모드 전환에 따른 UI 즉시 갱신 리렌더링
-            renderData(appData, document.getElementById('calc-formula-name').innerText);
+
+            function runOpenErEngine(formulaLabel, feeMultiplier) {
+                cordova.plugin.http.sendRequest("https://open.er-api.com/v6/latest/USD", {
+                    method: 'get', timeout: 2.5
+                }, function(response) {
+                    try {
+                        const data = JSON.parse(response.data);
+                        const rawMidRate = parseFloat(data?.rates?.KRW);
+                        if (!isNaN(rawMidRate) && rawMidRate > 0) {
+                            const processedAppliedRate = rawMidRate * feeMultiplier;
+                            if (data.rates) {
+                                for(let cur in data.rates) {
+                                    currentVisaRatesMap[cur] = 1 / parseFloat(data.rates[cur]);
+                                }
+                            }
+                            applyFinalRate(processedAppliedRate, formulaLabel, "기준: 보정환율 연산", "var(--accent-green)");
+                        } else {
+                            runFinalStorageRecovery();
+                        }
+                    } catch(e) { runFinalStorageRecovery(); }
+                }, function(err) { runFinalStorageRecovery(); });
+            }
+
+            // 온라인 연산 최악의 장애상황 대비 최종 오프라인 복구 레이어
+            function runFinalStorageRecovery() {
+                const savedLastRate = localStorage.getItem("themore_last_usd_rate");
+                applyFinalRate(parseFloat(savedLastRate || 1350.00), "통신 장애 내부저장소 값", "기준: 기기 내부 저장소", "var(--accent-red)");
+            }
         }
-    </script>
+  
+        function runExactThreeStepFormula(amtInput, info) { 
+            const brandApplied = amtInput * 1.011; 
+            const cardApplied = brandApplied * 1.0018; 
+            const finalRate = (rawNumericRate / info.rate_unit); 
+            return Math.floor(cardApplied * finalRate); 
+        }
+        
+        function formatForeignAmount(val, info) { if (val >= 1000 && (info.code === "IDR" || info.code === "VND" || info.code === "COP" || info.code === "CLP")) { return (val / 1000).toFixed(1) + "K"; } return val.toFixed(2); }
+        
+        function updateGuideTable() { 
+            if (!rawNumericRate || isNaN(rawNumericRate) || rawNumericRate <= 0) return; 
+            const info = getInfo(); 
+            if(!info) return; 
+            const targets = [5999, 6999, 7999, 8999, 9999]; 
+            const gridContainer = document.getElementById("guide_grid"); 
+            gridContainer.innerHTML = ""; 
+            const perUnitRate = (rawNumericRate / info.rate_unit); 
+            targets.forEach(tgt => { 
+                let targetForeign = tgt / (1.011 * 1.0018 * perUnitRate); 
+                let adjustedVal = Math.floor(targetForeign * 100) / 100; 
+                let itemDiv = document.createElement("div"); 
+                itemDiv.className = "guide-item"; 
+                let displayAmtStr = formatForeignAmount(adjustedVal, info); 
+                itemDiv.innerHTML = `<span>${tgt.toLocaleString()}원</span> <span class="arrow">➔</span> <span class="foreign">${displayAmtStr}${info.symbol}</span>`; 
+                gridContainer.appendChild(itemDiv); 
+            }); 
+        }
+        
+        function calculateBilling() { 
+            if (rawNumericRate <= 0) { alert("환율 정보가 활성화되지 않았습니다. 갱신을 먼저 눌러주세요."); return; } 
+            const amtInput = parseFloat(amountInput.value); 
+            if (isNaN(amtInput) || amtInput <= 0) return; 
+            const info = getInfo(); 
+            if(!info) return; 
+            
+            const finalBillingKrw = runExactThreeStepFormula(amtInput, info); 
+            const bufferedBillingKrw = Math.round(finalBillingKrw * 1.03); 
+            
+            document.getElementById("final_res").innerText = `청구예정 : ${finalBillingKrw.toLocaleString()} 원`; 
+            document.getElementById("buffer_res").innerText = `~ ${bufferedBillingKrw.toLocaleString()} 원까지 고려`; 
+            
+            const now = new Date(), timeStr = `${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}시${String(now.getMinutes()).padStart(2,'0')}분`; 
+            let logInputStr = formatForeignAmount(amtInput, info); 
+            
+            const logItem = {
+                time: timeStr,
+                inputAmt: logInputStr,
+                sym: info.symbol,
+                finalKrw: finalBillingKrw.toLocaleString(),
+                bufKrw: bufferedBillingKrw.toLocaleString()
+            };
+            
+            historyLog.unshift(logItem); 
+            if(historyLog.length > 30) historyLog.pop(); 
+            
+            saveAppState(); 
+            renderHistory(); 
+            amountInput.value = ""; 
+        }
+        
+        function renderHistory() { 
+            const box = document.getElementById("history_box"); 
+            if (historyLog.length === 0) { 
+                box.innerText = "이용 기록 대기 중..."; 
+                box.classList.remove("has-data"); 
+                return; 
+            } 
+            
+            const lines = historyLog.map(item => {
+                if (typeof item === 'string') return item; 
+                if (systemViewMode === "LARGE") {
+                    return `[${item.time}] ${item.inputAmt}${item.sym} = ${item.finalKrw}원`;
+                } else {
+                    return `[${item.time}] ${item.inputAmt}${item.sym} = ${item.finalKrw}원 (~${item.bufKrw}원)`;
+                }
+            });
+            
+            box.innerText = lines.join("\n"); 
+            box.classList.add("has-data"); 
+        }
+        
+        function clearHistory() { historyLog = []; saveAppState(); renderHistory(); }
+        
+        function initializeAppPipeline() { 
+            loadAppState(); 
+            changeEngineMode(systemViewMode); 
+            switchTab(currentTab, true); 
+            renderHistory(); 
+            syncRateLoader(); 
+        }
+        
+        document.addEventListener('deviceready', () => { 
+            initializeAppPipeline(); 
+        }, false);
+
+        window.addEventListener('DOMContentLoaded', () => { 
+            setTimeout(() => {
+                if(typeof cordova === "undefined") {
+                    initializeAppPipeline();
+                }
+            }, 600);
+        });
+   </script>
 </body>
 </html>
