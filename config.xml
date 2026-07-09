@@ -11,3 +11,10 @@
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
 </widget>
+
+<icon src="icon.png" />
+
+<platform name="android">
+    <icon src="icon.png" />
+</platform>
+
