@@ -2,6 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
+    <!-- Cordova 환경에 맞춘 보안 정책 설정 (Native HTTP 통신 허용) -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; media-src *; img-src 'self' data: content:; connect-src *;">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>The More for HJ</title>
@@ -111,9 +112,55 @@
         .log-box::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 3px; }
         .log-box.has-data { color: #38bdf8; }
         
-        .mode-controller { position: fixed; bottom: 20px; right: 12px; display: flex; flex-direction: column; gap: 16px; z-index: 10005; }
-        .mode-arrow-btn { width: 48px; height: 48px; border-radius: 50%; background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.05); color: rgba(255, 255, 255, 0.2); font-size: 16px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3); transition: all 0.2s ease; }
-        .mode-arrow-btn.active { background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(29, 78, 216, 0.3)); color: #ffffff; border-color: rgba(59, 130, 246, 0.4); box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3), inset 0 1px 1px rgba(255,255,255,0.1); }
+        /* -------------------------------------
+           [개선 사항 2] 우측 고정 화살표 모드 컨트롤러 프리미엄 반투명 스타일 리뉴얼
+        ------------------------------------- */
+        .mode-controller { 
+            position: fixed; 
+            bottom: 20px; 
+            right: 12px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 12px; 
+            z-index: 10005; 
+        }
+        .mode-arrow-btn { 
+            width: 48px; 
+            height: 48px; 
+            border-radius: 50%; 
+            background: rgba(255, 255, 255, 0.04); 
+            backdrop-filter: blur(10px); 
+            -webkit-backdrop-filter: blur(10px); 
+            border: 1px solid rgba(255, 255, 255, 0.08); 
+            color: rgba(255, 255, 255, 0.35); 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            cursor: pointer; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3); 
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0.6; /* 비활성화 시 은은한 투명도 유지 */
+        }
+        .mode-arrow-btn .arrow-icon { 
+            font-size: 11px; 
+            line-height: 1; 
+            margin-bottom: 1px;
+        }
+        .mode-arrow-btn .btn-text { 
+            font-size: 8.5px; 
+            font-weight: 800; 
+            letter-spacing: -0.5px;
+            line-height: 1;
+        }
+        /* 활성화(선택) 되었을 때 선명하고 이쁜 반투명 컬러 브랜딩 */
+        .mode-arrow-btn.active { 
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.35), rgba(29, 78, 216, 0.45)); 
+            color: #ffffff; 
+            border-color: rgba(59, 130, 246, 0.5); 
+            box-shadow: 0 6px 16px rgba(29, 78, 216, 0.35), inset 0 1px 1px rgba(255,255,255,0.15); 
+            opacity: 0.95; /* 눈에 띄게 투명도 최적화 */
+        }
         
         body.large-font-mode { padding: 6px; gap: 4px; }
         body.large-font-mode .tab-btn { font-size: 18px; padding: 10px; }
@@ -231,7 +278,7 @@
         }
 
         /* -------------------------------------
-           [공간 압축 수정] 원화 구간 최적 외화 모달 스타일 
+           [개선 사항 1] 원화 구간 최적 외화 모달 여백 조정 (오른쪽으로 밀기)
         ------------------------------------- */
         .guide-modal-overlay {
             display: none;
@@ -252,15 +299,15 @@
             border-radius: 16px;
             border: 2px solid rgba(244, 114, 182, 0.35);
             box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85);
-            padding: 12px 14px; /* 위아래 패딩 압축 */
+            padding: 12px 14px;
             display: flex;
             flex-direction: column;
-            gap: 8px; /* 타이틀, 리스트, 힌트 사이 간격 압축 */
+            gap: 8px;
             user-select: none;
-            max-height: 94vh; /* 스크롤 방지를 위해 가시 영역 극대화 */
+            max-height: 94vh;
         }
         .guide-modal-title {
-            font-size: 15px; /* 제목 크기 소폭 조절 */
+            font-size: 15px;
             font-weight: 900;
             text-align: center;
             letter-spacing: -0.4px;
@@ -273,23 +320,29 @@
         .guide-modal-list {
             display: flex;
             flex-direction: column;
-            gap: 3.5px; /* 리스트 아이템 간 간격 대폭 압축 */
-            overflow: hidden; /* 절대 스크롤되지 않도록 설정 */
+            gap: 3.5px;
+            overflow: hidden;
         }
         
         .pop-guide-item {
             display: grid;
             grid-template-columns: 78px 18px 1fr;
             align-items: center;
-            font-size: 14.5px; /* 글자 크기는 15px 수준 거의 그대로 유지 */
-            font-weight: 800;
-            padding: 4px 10px; /* 위아래 내부 패딩을 극단적으로 압축(8px -> 4px) */
+            font-size: 14.5px;
+            padding: 4px 10px;
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.04);
             border-radius: 7px;
         }
         .pop-guide-item span.arrow { text-align: center; color: var(--text-muted); font-size: 10px; }
-        .pop-guide-item span.foreign { color: var(--accent-green); text-align: left; font-size: 15px; padding-left: 2px; }
+        
+        /* 외화 금액이 화살표로부터 여유 공간을 가지도록 padding-left 확보 */
+        .pop-guide-item span.foreign { 
+            color: var(--accent-green); 
+            text-align: left; 
+            font-size: 15px; 
+            padding-left: 10px; /* 기존 2px에서 10px로 확대하여 왼쪽으로 딱 붙는 현상 해결 */
+        }
         .guide-modal-content .trend-close-hint { font-size: 10px; margin-top: 2px; }
 
         /* 대형 글자 모드 진입 시 스크롤 없는 최적화 여백 */
@@ -298,7 +351,7 @@
         body.large-font-mode .guide-modal-list { gap: 3px; }
         body.large-font-mode .pop-guide-item { padding: 4.5px 10px; grid-template-columns: 95px 22px 1fr; }
         body.large-font-mode .pop-guide-item span { font-size: 16.5px !important; }
-        body.large-font-mode .pop-guide-item span.foreign { font-size: 16.5px !important; }
+        body.large-font-mode .pop-guide-item span.foreign { font-size: 16.5px !important; padding-left: 14px; } /* 대형모드 여백 확보 */
     </style>
 </head>
 <body>
@@ -359,11 +412,19 @@
         </div>
     </div>
     
+    <!-- 모드 컨트롤러 내부 구조 리뉴얼 (큰글씨 / 일반글씨 텍스트 배치) -->
     <div class="mode-controller">
-        <div id="mode_up" class="mode-arrow-btn" onclick="changeEngineMode('LARGE')">▲</div>
-        <div id="mode_down" class="mode-arrow-btn active" onclick="changeEngineMode('NORMAL')">▼</div>
+        <div id="mode_up" class="mode-arrow-btn" onclick="changeEngineMode('LARGE')">
+            <span class="arrow-icon">▲</span>
+            <span class="btn-text">큰글씨</span>
+        </div>
+        <div id="mode_down" class="mode-arrow-btn active" onclick="changeEngineMode('NORMAL')">
+            <span class="arrow-icon">▼</span>
+            <span class="btn-text">일반글씨</span>
+        </div>
     </div>
 
+    <!-- 원화 구간별 최적 외화 테이블 12개 팝업 모달 -->
     <div id="guide_modal" class="guide-modal-overlay" onclick="closeGuidePopup()">
         <div class="guide-modal-content" onclick="closeGuidePopup(); event.stopPropagation();">
             <div class="guide-modal-title" id="pop_guide_title">구간별 최대 효율 외화 금액</div>
@@ -372,6 +433,7 @@
         </div>
     </div>
 
+    <!-- 상단 문구 변경 및 가시성 개선 반영 모달 팝업 영역 -->
     <div id="trend_modal" class="trend-modal-overlay" onclick="closeTrendPopup()">
         <div class="trend-modal-content" onclick="closeTrendPopup(); event.stopPropagation();">
             <div class="trend-modal-title">공개 환율 사이트 정보 (themore.app과 차이있음)</div>
