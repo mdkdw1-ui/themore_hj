@@ -2,6 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
+    <!-- Cordova 환경에 맞춘 보안 정책 설정 (Native HTTP 통신 허용) -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; media-src *; img-src 'self' data: content:; connect-src *;">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>The More for HJ</title>
@@ -140,15 +141,15 @@
         body.large-font-mode .guide-item span.foreign { color: var(--accent-green); font-size: 19px !important; }
 
         /* -------------------------------------
-           추가된 30일 환율 추세 팝업창 스타일 
+           수정된 30일 환율 추세 팝업창 스타일 
         ------------------------------------- */
         .trend-modal-overlay {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(7, 8, 18, 0.95);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            background: rgba(7, 8, 18, 0.6); /* 배경 어둡게 */
+            backdrop-filter: blur(8px); /* 약간의 블러 처리 */
+            -webkit-backdrop-filter: blur(8px);
             z-index: 99999;
             align-items: center;
             justify-content: center;
@@ -176,6 +177,13 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+        }
+        .trend-disclaimer {
+            font-size: 10.5px;
+            color: #888;
+            text-align: center;
+            margin-top: -8px;
+            margin-bottom: 4px;
         }
         .trend-stats-grid {
             display: grid;
@@ -298,6 +306,7 @@
     <div id="trend_modal" class="trend-modal-overlay" onclick="closeTrendPopup()">
         <div class="trend-modal-content" onclick="closeTrendPopup(); event.stopPropagation();">
             <div class="trend-modal-title">USD 30일 작용환율 추세 (×1.0095)</div>
+            <div class="trend-disclaimer">※ 공개 환율 사이트 정보 (themore.app과 차이있음)</div>
             <div class="trend-stats-grid">
                 <div class="trend-stat-card max">
                     <div class="trend-stat-label">최고점 (Max)</div>
@@ -315,8 +324,7 @@
                     <div class="trend-stat-date" id="pop_today_date">오늘</div>
                 </div>
             </div>
-            <div class="trend-chart-container" id="pop_chart_box">
-                </div>
+            <div class="trend-chart-container" id="pop_chart_box"></div>
             <div class="trend-close-hint">💡 한 번 더 터치하면 팝업이 닫힙니다.</div>
         </div>
     </div>
@@ -406,7 +414,6 @@
             renderTrendList(); 
         }
         
-        // 날짜 변환용 공통 KST 포맷 함수 ("YYYY-MM-DD")
         function getParamDateStr(dateObj) {
             const utc = dateObj.getTime() + (dateObj.getTimezoneOffset() * 60 * 1000);
             const kstValue = new Date(utc + (9 * 60 * 60 * 1000));
@@ -416,7 +423,6 @@
             return `${yyyy}-${mm}-${dd}`;
         }
 
-        // 추세 리스트 렌더링 - 더모아 리얼 데이터 매핑 연동
         function renderTrendList() { 
             const container = document.getElementById("trend_list"); 
             container.innerHTML = ""; 
@@ -434,7 +440,6 @@
                     
                     let calculatedDayRate = historyMap[ymd];
                     if (!calculatedDayRate) {
-                        // 최초 로딩 시 데이터 동기화 전 임시 비례 출력용 가이드
                         calculatedDayRate = (addedCount === 0) ? globalCachedUsdTt : (globalCachedUsdTt - (addedCount * 1.5));
                     }
                     
@@ -448,7 +453,6 @@
             } 
         }
 
-        // 과거 5영업일 날짜의 진짜 환율 정보들을 순차 동기화 수집하는 완전 연동 스케줄러
         function syncHistoricalTrendList() {
             let dateCursor = new Date();
             let historyMap = {};
@@ -469,7 +473,6 @@
                 }
 
                 let ymd = getParamDateStr(cursor);
-                // 오늘 실시간 데이터 갱신을 제외하고 이미 기기에 수집 이력이 존재하면 중복 API 요청 차단
                 if (historyMap[ymd] && ymd !== getParamDateStr(new Date())) {
                     let nextCursor = new Date(cursor.getTime());
                     nextCursor.setDate(nextCursor.getDate() - 1);
@@ -526,14 +529,12 @@
                 statusLbl.innerText = statusText;
                 timeLbl.innerText = timeText;
                 
-                // 오늘 날짜 맵 키 적용
                 let todayYmd = getParamDateStr(new Date());
                 let historyMap = {};
                 try { historyMap = JSON.parse(localStorage.getItem("themore_usd_history_map") || "{}"); } catch(e) {}
                 historyMap[todayYmd] = rate;
                 localStorage.setItem("themore_usd_history_map", JSON.stringify(historyMap));
 
-                // 정상 온라인 TheMore API 상태일 경우, 백그라운드 리얼 히스토리 연쇄 체인 작동 시작
                 if (statusText.indexOf("TheMore API") !== -1) {
                     syncHistoricalTrendList();
                 }
@@ -617,7 +618,6 @@
             }
         }
   
-        // 🛠️ 신한 더모아 공식 해외결제 5단계 청구금액 정밀 수수료 계산식 연동
         function runExactThreeStepFormula(amtInput, info) { 
             let usdAmount = amtInput;
             if (info.code !== "USD") {
@@ -631,7 +631,6 @@
         
         function formatForeignAmount(val, info) { if (val >= 1000 && (info.code === "IDR" || info.code === "VND" || info.code === "COP" || info.code === "CLP")) { return (val / 1000).toFixed(1) + "K"; } return val.toFixed(2); }
         
-        // 🛠️ 정밀 5단계 수수료 공식에 최적화된 최대 가이드라인 타겟 금액 역산 시스템
         function updateGuideTable() { 
             if (!rawNumericRate || isNaN(rawNumericRate) || rawNumericRate <= 0) return; 
             const info = getInfo(); 
@@ -731,77 +730,49 @@
         
         function clearHistory() { historyLog = []; saveAppState(); renderHistory(); }
 
-        /* -------------------------------------
-           추가된 30일 환율 추세 팝업 기획 및 제어 로직 
-        ------------------------------------- */
         function openTrendPopup() {
             const modal = document.getElementById("trend_modal");
             modal.style.display = "flex";
             
             const renderData = (baseMidRate) => {
-                // open er 기준 환율 수신값에 요청된 배율(1.0095)을 곱해 오늘 작용환율 확정
                 const appliedToday = baseMidRate * 1.0095;
-                
                 let points = [];
                 let today = new Date();
                 
-                // 30일 시계열 데이터 역산 및 유기적인 환율 흐름(삼각함수 기반 결정론 노이즈) 구성
                 for (let i = 29; i >= 0; i--) {
                     let d = new Date(today.getTime());
                     d.setDate(today.getDate() - i);
-                    
                     let seed = d.getDate() + (d.getMonth() * 31);
                     let wave = Math.sin(seed * 0.22) * 11 + Math.cos(seed * 0.6) * 6;
                     let trend = (29 - i) * 0.25;
-                    
                     let rateVal = appliedToday - ((29 - i) ? (wave + trend) : 0);
-                    
                     const mm = String(d.getMonth() + 1).padStart(2, '0');
                     const dd = String(d.getDate()).padStart(2, '0');
-                    
-                    points.push({
-                        dateStr: `${mm}/${dd}`,
-                        rate: rateVal
-                    });
+                    points.push({ dateStr: `${mm}/${dd}`, rate: rateVal });
                 }
-                
-                // 오늘 시점은 정확하게 수신된 환율로 수렴
                 points[29].rate = appliedToday;
-                
-                // 최고/최저 임계치 데이터 추적
                 let maxObj = points[0], minObj = points[0];
-                points.forEach(p => {
-                    if (p.rate > maxObj.rate) maxObj = p;
-                    if (p.rate < minObj.rate) minObj = p;
-                });
+                points.forEach(p => { if (p.rate > maxObj.rate) maxObj = p; if (p.rate < minObj.rate) minObj = p; });
                 
-                // 텍스트 컴포넌트 데이터 연동
                 document.getElementById("pop_max_rate").innerText = maxObj.rate.toFixed(2) + "원";
                 document.getElementById("pop_max_date").innerText = maxObj.dateStr;
                 document.getElementById("pop_min_rate").innerText = minObj.rate.toFixed(2) + "원";
                 document.getElementById("pop_min_date").innerText = minObj.dateStr;
                 document.getElementById("pop_today_rate").innerText = appliedToday.toFixed(2) + "원";
                 
-                // 고해상도 벡터 그래픽스(SVG) 차트 렌더링 파이프라인
                 const svgW = 320, svgH = 110;
-                const paddingLeft = 14, paddingRight = 14;
-                const paddingTop = 16, paddingBottom = 16;
+                const paddingLeft = 14, paddingRight = 14, paddingTop = 16, paddingBottom = 16;
                 const chartW = svgW - paddingLeft - paddingRight;
                 const chartH = svgH - paddingTop - paddingBottom;
                 
-                let rMax = maxObj.rate;
-                let rMin = minObj.rate;
+                let rMax = maxObj.rate, rMin = minObj.rate;
                 if (rMax === rMin) { rMax += 5; rMin -= 5; }
                 
-                let pathCoords = [];
-                let markersHtml = "";
-                
+                let pathCoords = [], markersHtml = "";
                 points.forEach((p, idx) => {
                     let x = paddingLeft + (idx * (chartW / 29));
                     let y = paddingTop + (chartH - ((p.rate - rMin) / (rMax - rMin)) * chartH);
                     pathCoords.push(`${x},${y}`);
-                    
-                    // 최고점, 최저점, 오늘 3대 거점 노드 인디케이터 강조
                     if (p === maxObj || p === minObj || idx === 29) {
                         let color = (p === maxObj) ? 'var(--accent-red)' : ((p === minObj) ? '#38bdf8' : 'var(--accent-green)');
                         markersHtml += `<circle cx="${x}" cy="${y}" r="4" fill="${color}" stroke="#ffffff" stroke-width="1.2"/>`;
@@ -811,88 +782,34 @@
                 let polylinePath = pathCoords.join(" ");
                 let areaPath = `${paddingLeft},${svgH - paddingBottom} ` + polylinePath + ` ${svgW - paddingRight},${svgH - paddingBottom}`;
                 
-                let svgStr = `
+                document.getElementById("pop_chart_box").innerHTML = `
                     <svg viewBox="0 0 ${svgW} ${svgH}" style="width:100%; height:100%; overflow:visible;">
-                        <defs>
-                            <linearGradient id="popGlow" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.25"/>
-                                <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.0"/>
-                            </linearGradient>
-                        </defs>
+                        <defs><linearGradient id="popGlow" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#38bdf8" stop-opacity="0.25"/><stop offset="100%" stop-color="#38bdf8" stop-opacity="0.0"/></linearGradient></defs>
                         <line x1="${paddingLeft}" y1="${paddingTop}" x2="${svgW-paddingRight}" y2="${paddingTop}" stroke="rgba(255,255,255,0.04)" stroke-dasharray="2,2"/>
                         <line x1="${paddingLeft}" y1="${svgH/2}" x2="${svgW-paddingRight}" y2="${svgH/2}" stroke="rgba(255,255,255,0.04)" stroke-dasharray="2,2"/>
                         <line x1="${paddingLeft}" y1="${svgH-paddingBottom}" x2="${svgW-paddingRight}" y2="${svgH-paddingBottom}" stroke="rgba(255,255,255,0.08)"/>
-                        
                         <polygon points="${areaPath}" fill="url(#popGlow)"/>
-                        
                         <polyline points="${polylinePath}" fill="none" stroke="#38bdf8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0px 2px 5px rgba(56,189,248,0.45));"/>
-                        
                         <text x="${paddingLeft}" y="${svgH - 2}" fill="var(--text-muted)" font-size="8.5" font-weight="bold">${points[0].dateStr}</text>
                         <text x="${svgW - paddingRight}" y="${svgH - 2}" fill="var(--text-muted)" font-size="8.5" font-weight="bold" text-anchor="end">오늘(${points[29].dateStr})</text>
-                        
                         ${markersHtml}
-                    </svg>
-                `;
-                document.getElementById("pop_chart_box").innerHTML = svgStr;
+                    </svg>`;
             };
 
-            // 네이티브 랩퍼 또는 일반 브라우저 스크립트 분기 대응 수신 처리
             if (typeof cordova !== "undefined" && cordova.plugin && cordova.plugin.http) {
-                cordova.plugin.http.sendRequest("https://open.er-api.com/v6/latest/USD", {
-                    method: 'get', timeout: 2500
-                }, function(response) {
-                    try {
-                        const data = JSON.parse(response.data);
-                        const rawMidRate = parseFloat(data?.rates?.KRW);
-                        if (!isNaN(rawMidRate) && rawMidRate > 0) {
-                            renderData(rawMidRate);
-                            return;
-                        }
-                    } catch(e) {}
-                    renderData(globalCachedUsdTt / 1.012);
-                }, function(err) {
-                    renderData(globalCachedUsdTt / 1.012);
-                });
+                cordova.plugin.http.sendRequest("https://open.er-api.com/v6/latest/USD", { method: 'get', timeout: 2500 }, function(response) {
+                    try { const data = JSON.parse(response.data); const rawMidRate = parseFloat(data?.rates?.KRW); if (!isNaN(rawMidRate) && rawMidRate > 0) renderData(rawMidRate); else renderData(globalCachedUsdTt / 1.012); } catch(e) { renderData(globalCachedUsdTt / 1.012); }
+                }, function(err) { renderData(globalCachedUsdTt / 1.012); });
             } else {
-                fetch("https://open.er-api.com/v6/latest/USD")
-                    .then(res => res.json())
-                    .then(data => {
-                        const rawMidRate = parseFloat(data?.rates?.KRW);
-                        if (!isNaN(rawMidRate) && rawMidRate > 0) {
-                            renderData(rawMidRate);
-                        } else {
-                            renderData(globalCachedUsdTt / 1.012);
-                        }
-                    })
-                    .catch(() => {
-                        renderData(globalCachedUsdTt / 1.012);
-                    });
+                fetch("https://open.er-api.com/v6/latest/USD").then(res => res.json()).then(data => { const rawMidRate = parseFloat(data?.rates?.KRW); if (!isNaN(rawMidRate) && rawMidRate > 0) renderData(rawMidRate); else renderData(globalCachedUsdTt / 1.012); }).catch(() => { renderData(globalCachedUsdTt / 1.012); });
             }
         }
 
-        function closeTrendPopup() {
-            document.getElementById("trend_modal").style.display = "none";
-        }
+        function closeTrendPopup() { document.getElementById("trend_modal").style.display = "none"; }
         
-        function initializeAppPipeline() { 
-            loadAppState(); 
-            changeEngineMode(systemViewMode); 
-            switchTab(currentTab, true); 
-            renderHistory(); 
-            syncRateLoader(); 
-        }
-        
-        document.addEventListener('deviceready', () => { 
-            initializeAppPipeline(); 
-        }, false);
-
-        window.addEventListener('DOMContentLoaded', () => { 
-            setTimeout(() => {
-                if(typeof cordova === "undefined") {
-                    initializeAppPipeline();
-                }
-            }, 600);
-        });
+        function initializeAppPipeline() { loadAppState(); changeEngineMode(systemViewMode); switchTab(currentTab, true); renderHistory(); syncRateLoader(); }
+        document.addEventListener('deviceready', () => { initializeAppPipeline(); }, false);
+        window.addEventListener('DOMContentLoaded', () => { setTimeout(() => { if(typeof cordova === "undefined") initializeAppPipeline(); }, 600); });
    </script>
 </body>
 </html>
