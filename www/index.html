@@ -139,15 +139,13 @@
         body.large-font-mode .guide-item span.arrow { font-size: 15px; color: var(--text-muted); }
         body.large-font-mode .guide-item span.foreign { color: var(--accent-green); font-size: 19px !important; }
 
-        /* -------------------------------------
-           [수정됨] 30일 환율 추세 팝업창 스타일 
-        ------------------------------------- */
+        /* 30일 환율 추세 팝업창 스타일 */
         .trend-modal-overlay {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(7, 8, 18, 0.45); /* 기존 화면이 약간 더 보이도록 불투명도 축소 */
-            backdrop-filter: blur(3.5px); /* 은은하게 뒤가 비치도록 블러 강도 축소 */
+            background: rgba(7, 8, 18, 0.45); 
+            backdrop-filter: blur(3.5px); 
             -webkit-backdrop-filter: blur(3.5px);
             z-index: 99999;
             align-items: center;
@@ -168,7 +166,7 @@
             user-select: none;
         }
         .trend-modal-title {
-            font-size: 14.5px; /* 길어진 문구가 예쁘게 들어가도록 폰트 크기 미세 조절 */
+            font-size: 14.5px; 
             font-weight: 900;
             text-align: center;
             letter-spacing: -0.4px;
@@ -231,6 +229,74 @@
             50% { opacity: 0.9; }
             100% { opacity: 0.4; }
         }
+
+        /* -------------------------------------
+           [신규 추가] 원화 구간 최적 외화 모달 스타일 
+        ------------------------------------- */
+        .guide-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(7, 8, 18, 0.45);
+            backdrop-filter: blur(3.5px);
+            -webkit-backdrop-filter: blur(3.5px);
+            z-index: 99999;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+        .guide-modal-content {
+            width: 100%;
+            max-width: 360px;
+            background: linear-gradient(145deg, var(--bg-panel-top) 0%, var(--bg-panel-bottom) 100%);
+            border-radius: 16px;
+            border: 2px solid rgba(244, 114, 182, 0.35);
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            user-select: none;
+            max-height: 80vh;
+        }
+        .guide-modal-title {
+            font-size: 16px;
+            font-weight: 900;
+            text-align: center;
+            letter-spacing: -0.4px;
+            background: linear-gradient(135deg, #f472b6 0%, #a855f7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .guide-modal-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+        .guide-modal-list::-webkit-scrollbar { width: 4px; }
+        .guide-modal-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
+        
+        .pop-guide-item {
+            display: grid;
+            grid-template-columns: 80px 20px 1fr;
+            align-items: center;
+            font-size: 15px;
+            font-weight: 800;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+        .pop-guide-item span.arrow { text-align: center; color: var(--text-muted); font-size: 11px; }
+        .pop-guide-item span.foreign { color: var(--accent-green); text-align: left; font-size: 16px; padding-left: 4px; }
+
+        /* 대형 글자 모드 시 신규 팝업 조절 */
+        body.large-font-mode .pop-guide-item { padding: 10px 14px; }
+        body.large-font-mode .pop-guide-item span { font-size: 18px !important; }
+        body.large-font-mode .guide-modal-title { font-size: 19px; }
     </style>
 </head>
 <body>
@@ -282,7 +348,7 @@
     </div>
 
     <div class="guide-panel premium-panel">
-        <div class="guide-left-area">
+        <div class="guide-left-area" onclick="openGuidePopup(); event.stopPropagation();" style="cursor: pointer;">
             <div id="guide_grid" class="guide-grid"></div>
         </div>
         <div class="guide-right-area" onclick="openTrendPopup(); event.stopPropagation();" style="cursor: pointer;">
@@ -294,6 +360,14 @@
     <div class="mode-controller">
         <div id="mode_up" class="mode-arrow-btn" onclick="changeEngineMode('LARGE')">▲</div>
         <div id="mode_down" class="mode-arrow-btn active" onclick="changeEngineMode('NORMAL')">▼</div>
+    </div>
+
+    <div id="guide_modal" class="guide-modal-overlay" onclick="closeGuidePopup()">
+        <div class="guide-modal-content" onclick="closeGuidePopup(); event.stopPropagation();">
+            <div class="guide-modal-title" id="pop_guide_title">구간별 최대 효율 외화 금액</div>
+            <div class="guide-modal-list" id="pop_guide_list"></div>
+            <div class="trend-close-hint">💡 한 번 더 터치하면 팝업이 닫힙니다.</div>
+        </div>
     </div>
 
     <div id="trend_modal" class="trend-modal-overlay" onclick="closeTrendPopup()">
@@ -623,6 +697,33 @@
         
         function formatForeignAmount(val, info) { if (val >= 1000 && (info.code === "IDR" || info.code === "VND" || info.code === "COP" || info.code === "CLP")) { return (val / 1000).toFixed(1) + "K"; } return val.toFixed(2); }
         
+        // [공통 분리] 역산 정밀 공식 처리 함수
+        function getAdjustedForeignForTarget(tgt, info) {
+            let approxUsd = tgt / (1.0018 * globalCachedUsdTt);
+            let startUsdInt = Math.floor(approxUsd * 100) + 5;
+            let bestBrandAppliedUsd = 0;
+            
+            for (let u = startUsdInt; u > 0; u--) {
+                let testUsd = u / 100;
+                let krw = Math.floor(testUsd * globalCachedUsdTt);
+                let fee = Math.floor(krw * 0.0018);
+                if (krw + fee <= tgt) {
+                    bestBrandAppliedUsd = testUsd;
+                    break;
+                }
+            }
+            let maxUsdAmount = (bestBrandAppliedUsd + 0.0049) / 1.011;
+            let targetForeign = maxUsdAmount;
+            if (info.code !== "USD") {
+                targetForeign = maxUsdAmount * globalCachedUsdTt / (rawNumericRate / info.rate_unit);
+            }
+            let adjustedVal = Math.floor(targetForeign * 100) / 100; 
+            while (adjustedVal > 0 && runExactThreeStepFormula(adjustedVal, info) > tgt) {
+                adjustedVal -= 0.01;
+            }
+            return adjustedVal;
+        }
+
         function updateGuideTable() { 
             if (!rawNumericRate || isNaN(rawNumericRate) || rawNumericRate <= 0) return; 
             const info = getInfo(); 
@@ -632,33 +733,7 @@
             gridContainer.innerHTML = ""; 
             
             targets.forEach(tgt => { 
-                let approxUsd = tgt / (1.0018 * globalCachedUsdTt);
-                let startUsdInt = Math.floor(approxUsd * 100) + 5;
-                let bestBrandAppliedUsd = 0;
-                
-                for (let u = startUsdInt; u > 0; u--) {
-                    let testUsd = u / 100;
-                    let krw = Math.floor(testUsd * globalCachedUsdTt);
-                    let fee = Math.floor(krw * 0.0018);
-                    if (krw + fee <= tgt) {
-                        bestBrandAppliedUsd = testUsd;
-                        break;
-                    }
-                }
-
-                let maxUsdAmount = (bestBrandAppliedUsd + 0.0049) / 1.011;
-                
-                let targetForeign = maxUsdAmount;
-                if (info.code !== "USD") {
-                    targetForeign = maxUsdAmount * globalCachedUsdTt / (rawNumericRate / info.rate_unit);
-                }
-                
-                let adjustedVal = Math.floor(targetForeign * 100) / 100; 
-                
-                while (adjustedVal > 0 && runExactThreeStepFormula(adjustedVal, info) > tgt) {
-                    adjustedVal -= 0.01;
-                }
-                
+                let adjustedVal = getAdjustedForeignForTarget(tgt, info);
                 let itemDiv = document.createElement("div"); 
                 itemDiv.className = "guide-item"; 
                 let displayAmtStr = formatForeignAmount(adjustedVal, info); 
@@ -667,6 +742,38 @@
             }); 
         }
         
+        /* -------------------------------------
+           [신규 추가] 원화 정보창 클릭시 구간별 12개 출력 팝업 로직
+        ------------------------------------- */
+        function openGuidePopup() {
+            if (!rawNumericRate || isNaN(rawNumericRate) || rawNumericRate <= 0) return; 
+            const info = getInfo(); 
+            if(!info) return; 
+
+            const modal = document.getElementById("guide_modal");
+            const listContainer = document.getElementById("pop_guide_list");
+            const titleElement = document.getElementById("pop_guide_title");
+            
+            titleElement.innerText = `${info.name} (${info.code}) 최적 결제선`;
+            listContainer.innerHTML = "";
+
+            // 5999부터 16999까지 총 12개 구간 동적 생성
+            for (let i = 0; i < 12; i++) {
+                let tgt = 5999 + (i * 1000);
+                let adjustedVal = getAdjustedForeignForTarget(tgt, info);
+                let displayAmtStr = formatForeignAmount(adjustedVal, info);
+
+                let itemDiv = document.createElement("div");
+                itemDiv.className = "pop-guide-item";
+                itemDiv.innerHTML = `<span>${tgt.toLocaleString()}원</span> <span class="arrow">➔</span> <span class="foreign">${displayAmtStr}${info.symbol}</span>`;
+                listContainer.appendChild(itemDiv);
+            }
+
+            modal.style.display = "flex";
+        }
+
+        function closeGuidePopup() { document.getElementById("guide_modal").style.display = "none"; }
+
         function calculateBilling() { 
             if (rawNumericRate <= 0) { alert("환율 정보가 활성화되지 않았습니다. 갱신을 먼저 눌러주세요."); return; } 
             const amtInput = parseFloat(amountInput.value); 
@@ -797,6 +904,7 @@
             }
         }
 
+        function toggleTrendPopup() { const modal = document.getElementById("trend_modal"); if(modal.style.display === "flex") closeTrendPopup(); else openTrendPopup(); }
         function closeTrendPopup() { document.getElementById("trend_modal").style.display = "none"; }
         
         function initializeAppPipeline() { loadAppState(); changeEngineMode(systemViewMode); switchTab(currentTab, true); renderHistory(); syncRateLoader(); }
