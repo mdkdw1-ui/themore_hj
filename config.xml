@@ -10,8 +10,23 @@
     <content src="index.html" />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
+    
+    <!-- 1. 앱 아이콘은 기존 설정(icon.png) 그대로 유지 -->
     <icon src="icon.png" />
+    
     <platform name="android">
+        <!-- 안드로이드 앱 아이콘 기존 설정 그대로 유지 -->
         <icon src="icon.png" />
+
+        <!-- 2. ⭐️ 로딩 시 보여줄 스플래시 로고만 res/logo.png로 변경 -->
+        <preference name="AndroidWindowSplashscreenAnimatedIcon" value="res/logo.png" />
+        
+        <!-- 로딩 화면 배경색 (원하시는 배경색 Hex 코드로 변경하셔도 됩니다) -->
+        <preference name="AndroidWindowSplashscreenBackgroundColor" value="#0a0b16" />
+        
+        <!-- 스플래시 화면 제어 설정 -->
+        <preference name="SplashScreen" value="screen" />
+        <preference name="AutoHideSplashScreen" value="true" />
+        <preference name="SplashScreenDelay" value="2000" />
     </platform>
 </widget>
