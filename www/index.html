@@ -2,7 +2,6 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <!-- Cordova 환경에 맞춘 보안 정책 설정 (Native HTTP 통신 허용) -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; media-src *; img-src 'self' data: content:; connect-src *;">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>The More for HJ</title>
@@ -96,7 +95,6 @@
         .guide-item span.arrow { text-align: center; color: var(--text-muted); font-size: 10px; }
         .guide-item span.foreign { text-align: left; color: #e2e8f0; padding-left: 2px; }
         
-        /* [우측 트렌드 영역 슬라이더 구조 개선 CSS] */
         .guide-right-area { 
             flex: 0.9; 
             border-left: 1px solid rgba(255,255,255,0.08); 
@@ -118,7 +116,7 @@
         }
         .trend-slider-track { 
             display: flex; 
-            width: 200%; /* 2페이지 수용 */
+            width: 200%; 
             transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1); 
             will-change: transform;
         }
@@ -133,7 +131,6 @@
         .trend-row { display: flex; justify-content: flex-start; font-size: 13.5px; font-weight: 700; color: #38bdf8; white-space: nowrap; gap: 8px; line-height: 1.4; }
         .trend-rate { color: var(--accent-green); min-width: 50px; }
         
-        /* 하단 페이지 도트 스타일 정의 */
         .trend-dots { 
             display: flex; 
             justify-content: center; 
@@ -236,42 +233,58 @@
         body.large-font-mode .guide-item span.arrow { font-size: 15px; color: var(--text-muted); }
         body.large-font-mode .guide-item span.foreign { color: var(--accent-green); font-size: 19px !important; }
         
-        /* 큰글씨 대응을 위한 도트 크기 조절 */
         body.large-font-mode .trend-dots { margin-top: 8px; }
         body.large-font-mode .trend-dot { width: 6px; height: 6px; }
         body.large-font-mode .trend-dot.active { width: 14px; }
 
+        /* [개선된 글래스모피즘 + 바텀 시트 팝업] */
         .trend-modal-overlay {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(7, 8, 18, 0.45); 
-            backdrop-filter: blur(3.5px); 
-            -webkit-backdrop-filter: blur(3.5px);
+            background: rgba(4, 5, 11, 0.45); 
+            backdrop-filter: blur(8px); 
+            -webkit-backdrop-filter: blur(8px);
             z-index: 99999;
-            align-items: center;
+            align-items: flex-end; /* 화면 하단에 밀착시킴 */
             justify-content: center;
-            padding: 16px;
         }
         .trend-modal-content {
             width: 100%;
-            max-width: 360px;
-            background: linear-gradient(145deg, var(--bg-panel-top) 0%, var(--bg-panel-bottom) 100%);
-            border-radius: 16px;
-            border: 2px solid rgba(56, 189, 248, 0.35);
-            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85);
-            padding: 20px;
+            max-width: 500px;
+            background: linear-gradient(180deg, rgba(27, 30, 54, 0.9) 0%, rgba(11, 12, 24, 0.98) 100%);
+            border-top-left-radius: 24px;
+            border-top-right-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-bottom: none;
+            box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.8);
+            padding: 24px 20px 34px 20px;
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 18px;
             user-select: none;
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.1, 0.76, 0.55, 0.94);
         }
+        .trend-modal-overlay.active .trend-modal-content {
+            transform: translateY(0);
+        }
+        
+        /* 바텀시트 손잡이(Handle) */
+        .bottom-sheet-handle {
+            width: 44px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.25);
+            border-radius: 3px;
+            margin: -12px auto 6px auto;
+        }
+
         .trend-modal-title {
-            font-size: 14.5px; 
+            font-size: 15px; 
             font-weight: 900;
             text-align: center;
             letter-spacing: -0.4px;
-            background: linear-gradient(135deg, #38bdf8 0%, #a855f7 100%);
+            background: linear-gradient(135deg, #38bdf8 0%, #f472b6 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -284,10 +297,11 @@
             text-align: center;
         }
         .trend-stat-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 11px;
             padding: 8px 4px;
+            position: relative;
         }
         .trend-stat-label {
             font-size: 10px;
@@ -309,15 +323,46 @@
             margin-top: 2px;
             font-weight: bold;
         }
+        
+        /* [드래그 영역이 확보된 그래프 박스] */
         .trend-chart-container {
             width: 100%;
-            height: 130px;
-            background: rgba(0, 0, 0, 0.45);
-            border-radius: 10px;
+            height: 140px;
+            background: rgba(0, 0, 0, 0.55);
+            border-radius: 14px;
             padding: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.05);
             position: relative;
+            overflow: visible;
+            touch-action: none; /* 브라우저 기본 드래그 무시 */
         }
+        
+        /* [차트 탐색 오버레이 툴팁] */
+        .chart-tooltip-bubble {
+            position: absolute;
+            top: -5px;
+            left: 50%;
+            transform: translate(-50%, -100%);
+            background: rgba(15, 23, 42, 0.95);
+            border: 1.5px solid #38bdf8;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            padding: 5px 8px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #ffffff;
+            pointer-events: none;
+            display: none;
+            z-index: 10;
+            white-space: nowrap;
+        }
+        .chart-tooltip-bubble .tooltip-date {
+            color: var(--text-muted);
+            font-size: 9.5px;
+            display: block;
+            text-align: center;
+        }
+
         .trend-close-hint {
             text-align: center;
             font-size: 11px;
@@ -455,18 +500,14 @@
         <div class="guide-left-area" onclick="openGuidePopup(); event.stopPropagation();" style="cursor: pointer;">
             <div id="guide_grid" class="guide-grid"></div>
         </div>
-        <!-- 우측 추세 영역: 인라인 onclick 제거, JS에서 정밀 터치/스와이프 핸들러로 수신함 -->
         <div class="guide-right-area">
             <span class="trend-title" id="trend_title">최근 추세 (USD)</span>
             <div class="trend-slider-viewport">
                 <div class="trend-slider-track" id="trend_slider_track">
-                    <!-- USD 5일 추세 (0페이지) -->
                     <div class="trend-slide" id="trend_slide_usd"></div>
-                    <!-- 선택 외화 5일 추세 (1페이지) -->
                     <div class="trend-slide" id="trend_slide_sel"></div>
                 </div>
             </div>
-            <!-- 페이지를 알려주는 2개의 하단 점(Dot) -->
             <div class="trend-dots">
                 <span class="trend-dot active" id="dot_0"></span>
                 <span class="trend-dot" id="dot_1"></span>
@@ -485,7 +526,6 @@
         </div>
     </div>
 
-    <!-- 원화 구간별 최적 외화 테이블 12개 팝업 모달 -->
     <div id="guide_modal" class="guide-modal-overlay" onclick="closeGuidePopup()">
         <div class="guide-modal-content" onclick="closeGuidePopup(); event.stopPropagation();">
             <div class="guide-modal-title" id="pop_guide_title">구간별 최대 효율 외화 금액</div>
@@ -494,9 +534,9 @@
         </div>
     </div>
 
-    <!-- 환율 추세 30일 그래프 팝업 모달 -->
     <div id="trend_modal" class="trend-modal-overlay" onclick="closeTrendPopup()">
-        <div class="trend-modal-content" onclick="closeTrendPopup(); event.stopPropagation();">
+        <div class="trend-modal-content" onclick="event.stopPropagation();">
+            <div class="bottom-sheet-handle"></div>
             <div class="trend-modal-title">공개 환율 사이트 정보 (themore.app과 차이있음)</div>
             <div class="trend-stats-grid">
                 <div class="trend-stat-card max">
@@ -515,8 +555,10 @@
                     <div class="trend-stat-date" id="pop_today_date">오늘</div>
                 </div>
             </div>
+            
             <div class="trend-chart-container" id="pop_chart_box"></div>
-            <div class="trend-close-hint">💡 한 번 더 터치하면 팝업이 닫힙니다.</div>
+            
+            <div class="trend-close-hint" onclick="closeTrendPopup()">💡 한 번 더 터치하거나 아래로 쓸어내리면 닫힙니다.</div>
         </div>
     </div>
     
@@ -543,7 +585,7 @@
             "GBP": { code: "GBP", name: "영국 파운드", symbol: "£", rate_unit: 1, default: 1710.00, continent: "EU_ME" },
             "CHF": { code: "CHF", name: "스위스 프랑", symbol: "CHF", rate_unit: 1, default: 1510.00, continent: "EU_ME" },
             "SEK": { code: "SEK", name: "스웨덴 크로나", symbol: "kr", rate_unit: 1, default: 128.00, continent: "EU_ME" },
-            "DKK": { code: "DKK", name: "덴마크 크로나", symbol: "kr", rate_unit: 1, default: 195.00, continent: "EU_ME" },
+            "DKK": { code: DKK, name: "덴마크 크로나", symbol: "kr", rate_unit: 1, default: 195.00, continent: "EU_ME" },
             "NOK": { code: "NOK", name: "노르웨이 크로나", symbol: "kr", rate_unit: 1, default: 125.00, continent: "EU_ME" },
             "RUB": { code: "RUB", name: "러시아 루블", symbol: "₽", rate_unit: 1, default: 14.50, continent: "EU_ME" },
             "TRY": { code: "TRY", name: "터키 리라", symbol: "₺", rate_unit: 1, default: 39.50, continent: "EU_ME" },
@@ -567,9 +609,10 @@
         let lastMainCurrency = "USD", lastSubContinent = "ALL", lastSubCurrency = "HKD", rawNumericRate = 0, systemViewMode = "NORMAL";
         let globalCachedUsdTt = 1350.00; 
         let currentVisaRatesMap = {}; 
-
-        // 추세 슬라이더 페이지 상태 관리 (0: USD, 1: 선택 외화)
         let trendActivePage = 0;
+
+        // [30일 그래프 드래그 탐색 메모리 캐시]
+        let globalChartPoints = []; 
 
         const rateInput = document.getElementById("rate_input"), amountInput = document.getElementById("amount_input");
         amountInput.addEventListener("keydown", function(e) { if (e.key === "Enter") { e.preventDefault(); calculateBilling(); this.blur(); } });
@@ -617,7 +660,6 @@
             return `${yyyy}-${mm}-${dd}`;
         }
 
-        // [스와이프 상태 적용 및 타이틀 변경 헬퍼]
         function setTrendPage(pageIdx, isUserSwipe = false) {
             trendActivePage = pageIdx;
             const track = document.getElementById("trend_slider_track");
@@ -638,13 +680,11 @@
                 dot1.classList.add("active");
             }
             
-            // 사용자가 의도적으로 스와이프할 때 네이티브 부드러운 햅틱 체감 구현
             if (isUserSwipe && navigator && navigator.vibrate) {
                 navigator.vibrate(12); 
             }
         }
 
-        // [양측 슬라이드(USD, 선택외화)에 맞춘 5일 데이터 실시간 렌더링]
         function renderTrendList() { 
             const usdContainer = document.getElementById("trend_slide_usd"); 
             const selContainer = document.getElementById("trend_slide_sel"); 
@@ -668,7 +708,6 @@
                     let ymd = getParamDateStr(dateCursor);
                     let dateString = `${String(dateCursor.getMonth() + 1).padStart(2, '0')}/${String(dateCursor.getDate()).padStart(2, '0')}`; 
                     
-                    // 1. USD 일별 기준 환율
                     let calculatedDayUsdRate = historyMap[ymd];
                     if (!calculatedDayUsdRate) {
                         calculatedDayUsdRate = (addedCount === 0) ? globalCachedUsdTt : (globalCachedUsdTt - (addedCount * 1.5));
@@ -679,7 +718,6 @@
                     usdRow.innerHTML = `<span class="trend-date">${dateString}</span> <span class="trend-rate">${calculatedDayUsdRate.toFixed(1)}원</span>`; 
                     usdContainer.appendChild(usdRow); 
 
-                    // 2. 선택 외화 일별 교차 환율 연산
                     let calculatedDaySelRate = 0;
                     if (info.code === "USD") {
                         calculatedDaySelRate = calculatedDayUsdRate;
@@ -694,7 +732,6 @@
 
                     let selRow = document.createElement("div");
                     selRow.className = "trend-row";
-                    // 선택 외화는 세련된 핑크 계열 포인트 컬러 지정
                     selRow.innerHTML = `<span class="trend-date">${dateString}</span> <span class="trend-rate" style="color: var(--accent-pink);">${calculatedDaySelRate.toFixed(1)}원</span>`;
                     selContainer.appendChild(selRow);
                     
@@ -703,7 +740,6 @@
                 dateCursor.setDate(dateCursor.getDate() - 1); 
             } 
             
-            // 슬라이더 텍스트 헤더와 점 활성화 동기화
             setTrendPage(trendActivePage);
         }
 
@@ -1012,35 +1048,39 @@
         
         function clearHistory() { historyLog = []; saveAppState(); renderHistory(); }
 
-        // [30일 그래프 팝업: USD/선택외화 모드별 이원화 연동 처리]
+        // [30일 그래프 바텀시트 팝업 연동 및 그라데이션 차트화]
         function openTrendPopup() {
             const modal = document.getElementById("trend_modal");
             modal.style.display = "flex";
             
+            // 바텀시트 슬라이드 애니메이션 적용을 위한 비동기 처리
+            setTimeout(() => {
+                modal.classList.add("active");
+            }, 10);
+            
             const info = getInfo();
             if (!info) return;
 
-            // 현재 스와이프 페이지가 0번이거나 선택 통화 자체가 USD인 경우 -> USD 모드 적용
             const isUsdMode = (trendActivePage === 0 || info.code === "USD");
             const modalTitle = document.querySelector(".trend-modal-title");
             
             if (isUsdMode) {
-                modalTitle.innerText = "공개 환율 사이트 정보 (themore.app과 차이있음)";
+                modalTitle.innerText = "공개 환율 사이트 정보 (USD/KRW)";
             } else {
                 modalTitle.innerText = `공개 환율 사이트 정보 (${info.name} ${info.code}/KRW)`;
             }
             
-            const today = new Date();
+            const today = new Date(); // 매 호출마다 동적으로 재생성하여 날짜 미갱신 버그 완벽차단
             const endDate = getParamDateStr(today);
             const thirtyDaysAgo = new Date();
             thirtyDaysAgo.setDate(today.getDate() - 30);
             const startDate = getParamDateStr(thirtyDaysAgo);
             
-            // USD 모드이면 KRW만, 외화 모드이면 USD와 외화의 변동을 동시에 가져와 정밀 교차 연산
             const symbolsParam = isUsdMode ? "KRW" : `KRW,${info.code}`;
-            const url = `https://api.frankfurter.app/${startDate}..${endDate}?base=USD&symbols=${symbolsParam}`;
+            
+            // 캐시 미갱신 방지를 위한 고유한 타임스탬프 파라미터 적용 (_t)
+            const url = `https://api.frankfurter.app/${startDate}..${endDate}?base=USD&symbols=${symbolsParam}&_t=${Date.now()}`;
 
-            // 오프라인 / 통신장애 대응: LCG 선형합동 난수 알고리즘으로 무질서하게 왜곡되지 않는 환가 변동(Random Walk) 합성 차트 렌더링
             const runFallbackChart = () => {
                 let points = [];
                 let seed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
@@ -1070,6 +1110,8 @@
             };
 
             const renderChartWithPoints = (points) => {
+                globalChartPoints = points; // 터치 드래그 연산용 전역 캐시 저장
+                
                 let maxObj = points[0], minObj = points[0];
                 points.forEach(p => { 
                     if (p.rate > maxObj.rate) maxObj = p; 
@@ -1084,50 +1126,93 @@
                 document.getElementById("pop_min_date").innerText = minObj.dateStr;
                 document.getElementById("pop_today_rate").innerText = activeTodayRate.toFixed(2) + "원";
                 
-                const svgW = 320, svgH = 110;
-                const paddingLeft = 14, paddingRight = 14, paddingTop = 16, paddingBottom = 16;
+                const svgW = 340, svgH = 130;
+                const paddingLeft = 14, paddingRight = 14, paddingTop = 20, paddingBottom = 20;
                 const chartW = svgW - paddingLeft - paddingRight;
                 const chartH = svgH - paddingTop - paddingBottom;
                 
                 let rMax = maxObj.rate, rMin = minObj.rate;
                 if (rMax === rMin) { rMax += 5; rMin -= 5; }
                 
-                let pathCoords = [], markersHtml = "";
+                // [Smooth Curve 곡선 공식 처리 연산 및 SVG 패스 생성]
+                let pathCoords = [];
+                let pointsArr = points.map((p, idx) => {
+                    return {
+                        x: paddingLeft + (idx * (chartW / 29)),
+                        y: paddingTop + (chartH - ((p.rate - rMin) / (rMax - rMin)) * chartH)
+                    };
+                });
+
+                // 큐빅 베지어 스무스 곡선(Smooth Spline) 경로 스트링 빌드
+                let splineStr = `M ${pointsArr[0].x} ${pointsArr[0].y}`;
+                for (let i = 0; i < pointsArr.length - 1; i++) {
+                    const cpX1 = pointsArr[i].x + (chartW / 29) / 2;
+                    const cpY1 = pointsArr[i].y;
+                    const cpX2 = pointsArr[i].x + (chartW / 29) / 2;
+                    const cpY2 = pointsArr[i+1].y;
+                    splineStr += ` C ${cpX1} ${cpY1}, ${cpX2} ${cpY2}, ${pointsArr[i+1].x} ${pointsArr[i+1].y}`;
+                }
+
+                let areaSplineStr = splineStr + ` L ${svgW - paddingRight} ${svgH - paddingBottom} L ${paddingLeft} ${svgH - paddingBottom} Z`;
+                
+                let markersHtml = "";
                 points.forEach((p, idx) => {
-                    let x = paddingLeft + (idx * (chartW / 29));
-                    let y = paddingTop + (chartH - ((p.rate - rMin) / (rMax - rMin)) * chartH);
-                    pathCoords.push(`${x},${y}`);
-                    if (p === maxObj || p === minObj || idx === 29) {
-                        let color = (p === maxObj) ? 'var(--accent-red)' : ((p === minObj) ? '#38bdf8' : 'var(--accent-green)');
-                        markersHtml += `<circle cx="${x}" cy="${y}" r="4" fill="${color}" stroke="#ffffff" stroke-width="1.2"/>`;
+                    const pt = pointsArr[idx];
+                    // 최고점, 최저점, 오늘 환율 마커 렌더링
+                    if (p === maxObj) {
+                        markersHtml += `
+                            <circle cx="${pt.x}" cy="${pt.y}" r="5" fill="var(--accent-red)" stroke="#ffffff" stroke-width="1.5"/>
+                            <text x="${pt.x}" y="${pt.y - 8}" fill="var(--accent-red)" font-size="8.5" font-weight="900" text-anchor="middle">▲최고</text>
+                        `;
+                    } else if (p === minObj) {
+                        markersHtml += `
+                            <circle cx="${pt.x}" cy="${pt.y}" r="5" fill="#38bdf8" stroke="#ffffff" stroke-width="1.5"/>
+                            <text x="${pt.x}" y="${pt.y + 13}" fill="#38bdf8" font-size="8.5" font-weight="900" text-anchor="middle">▼최저</text>
+                        `;
+                    } else if (idx === 29) {
+                        // 오늘 환율 맥박 뛰는 포커스 링 Pulsing Ring 효과 적용
+                        markersHtml += `
+                            <circle cx="${pt.x}" cy="${pt.y}" r="10" fill="none" stroke="var(--accent-green)" stroke-width="1.5" opacity="0.6">
+                                <animate attributeName="r" values="4;11;4" dur="2s" repeatCount="indefinite" />
+                                <animate attributeName="opacity" values="0.8;0;0.8" dur="2s" repeatCount="indefinite" />
+                            </circle>
+                            <circle cx="${pt.x}" cy="${pt.y}" r="4" fill="var(--accent-green)" stroke="#ffffff" stroke-width="1.5"/>
+                        `;
                     }
                 });
                 
-                let polylinePath = pathCoords.join(" ");
-                let areaPath = `${paddingLeft},${svgH - paddingBottom} ` + polylinePath + ` ${svgW - paddingRight},${svgH - paddingBottom}`;
-                
-                // [프리미엄 아이디어]: USD는 블루 테마, 선택 외화는 핑크 테마로 차트 스킨 스위칭
                 const chartStrokeColor = isUsdMode ? "#38bdf8" : "var(--accent-pink)";
                 const areaStopColor = isUsdMode ? "#38bdf8" : "var(--accent-pink)";
-                const dropShadowFilter = isUsdMode ? "rgba(56,189,248,0.45)" : "rgba(244,114,182,0.45)";
+                const dropShadowFilter = isUsdMode ? "rgba(56,189,248,0.4)" : "rgba(244,114,182,0.4)";
 
                 document.getElementById("pop_chart_box").innerHTML = `
+                    <div id="chart_tooltip" class="chart-tooltip-bubble">
+                        <span class="tooltip-date" id="tooltip_date">07/15</span>
+                        <span id="tooltip_rate">1,350.21원</span>
+                    </div>
+                    
+                    <div id="tooltip_vertical_line" style="position:absolute; top:${paddingTop}px; bottom:${paddingBottom}px; width:1px; background:rgba(56,189,248,0.55); border-left:1px dashed #38bdf8; display:none; pointer-events:none; z-index:1;"></div>
+
                     <svg viewBox="0 0 ${svgW} ${svgH}" style="width:100%; height:100%; overflow:visible;">
                         <defs>
                             <linearGradient id="popGlow" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stop-color="${areaStopColor}" stop-opacity="0.25"/>
+                                <stop offset="0%" stop-color="${areaStopColor}" stop-opacity="0.3"/>
                                 <stop offset="100%" stop-color="${areaStopColor}" stop-opacity="0.0"/>
                             </linearGradient>
                         </defs>
                         <line x1="${paddingLeft}" y1="${paddingTop}" x2="${svgW-paddingRight}" y2="${paddingTop}" stroke="rgba(255,255,255,0.04)" stroke-dasharray="2,2"/>
                         <line x1="${paddingLeft}" y1="${svgH/2}" x2="${svgW-paddingRight}" y2="${svgH/2}" stroke="rgba(255,255,255,0.04)" stroke-dasharray="2,2"/>
                         <line x1="${paddingLeft}" y1="${svgH-paddingBottom}" x2="${svgW-paddingRight}" y2="${svgH-paddingBottom}" stroke="rgba(255,255,255,0.08)"/>
-                        <polygon points="${areaPath}" fill="url(#popGlow)"/>
-                        <polyline points="${polylinePath}" fill="none" stroke="${chartStrokeColor}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0px 2px 5px ${dropShadowFilter});"/>
+                        
+                        <path d="${areaSplineStr}" fill="url(#popGlow)"/>
+                        <path d="${splineStr}" fill="none" stroke="${chartStrokeColor}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0px 2.5px 5px ${dropShadowFilter});"/>
+                        
                         <text x="${paddingLeft}" y="${svgH - 2}" fill="var(--text-muted)" font-size="8.5" font-weight="bold">${points[0].dateStr}</text>
                         <text x="${svgW - paddingRight}" y="${svgH - 2}" fill="var(--text-muted)" font-size="8.5" font-weight="bold" text-anchor="end">오늘(${points[29].dateStr})</text>
                         ${markersHtml}
                     </svg>`;
+
+                initChartInteractivity(paddingLeft, chartW); // 손가락 탐색 리스너 바인딩
             };
 
             const processFrankfurterData = (data) => {
@@ -1219,8 +1304,75 @@
             }
         }
 
-        function toggleTrendPopup() { const modal = document.getElementById("trend_modal"); if(modal.style.display === "flex") closeTrendPopup(); else openTrendPopup(); }
-        function closeTrendPopup() { document.getElementById("trend_modal").style.display = "none"; }
+        // [손가락 드래그 탐색 및 햅틱 진동 피드백 정밀 구현]
+        function initChartInteractivity(paddingLeft, chartW) {
+            const chartBox = document.getElementById("pop_chart_box");
+            const tooltip = document.getElementById("chart_tooltip");
+            const vLine = document.getElementById("tooltip_vertical_line");
+            const tooltipDate = document.getElementById("tooltip_date");
+            const tooltipRate = document.getElementById("tooltip_rate");
+            
+            let lastIndex = -1;
+
+            const handleMove = (clientX) => {
+                if (!globalChartPoints.length) return;
+                
+                const rect = chartBox.getBoundingClientRect();
+                const relativeX = clientX - rect.left - paddingLeft;
+                
+                // 가로 좌표를 기준으로 30개 포인트 중 어느 위치인지 인덱스 연산
+                let rawIdx = Math.round((relativeX / chartW) * 29);
+                let idx = Math.max(0, Math.min(29, rawIdx));
+                
+                // 새로운 날짜 경계 영역에 진입했을 경우
+                if (idx !== lastIndex) {
+                    lastIndex = idx;
+                    const p = globalChartPoints[idx];
+                    
+                    // 네이티브 미세 진동(Haptic Feedback) 활성화 (Android/iOS 웹뷰 공용)
+                    if (navigator && navigator.vibrate) {
+                        navigator.vibrate(8); // 경쾌하고 부드러운 8ms 햅틱 터치
+                    }
+                    
+                    // 툴팁 기포 텍스트 및 위치 배치 변경
+                    tooltipDate.innerText = p.dateStr;
+                    tooltipRate.innerText = p.rate.toFixed(2) + "원";
+                    
+                    // 툴팁 위치 정밀 연산
+                    const pointX = paddingLeft + (idx * (chartW / 29));
+                    tooltip.style.left = `${(pointX / rect.width) * 100}%`;
+                    tooltip.style.display = "block";
+                    
+                    vLine.style.left = `${pointX}px`;
+                    vLine.style.display = "block";
+                }
+            };
+
+            const handleEnd = () => {
+                tooltip.style.display = "none";
+                vLine.style.display = "none";
+                lastIndex = -1;
+            };
+
+            // 모바일 터치 이벤트 연결
+            chartBox.addEventListener("touchstart", (e) => {
+                handleMove(e.touches[0].clientX);
+            }, { passive: true });
+
+            chartBox.addEventListener("touchmove", (e) => {
+                handleMove(e.touches[0].clientX);
+            }, { passive: true });
+
+            chartBox.addEventListener("touchend", handleEnd, { passive: true });
+        }
+
+        function closeTrendPopup() { 
+            const modal = document.getElementById("trend_modal");
+            modal.classList.remove("active");
+            setTimeout(() => {
+                modal.style.display = "none";
+            }, 300); // 슬라이드 다운 애니메이션 대기 시간
+        }
         
         // [정밀 터치 디스패처: 스와이프 제스처와 단순 탭 터치 완벽 분리 구현]
         let touchStartX = 0, touchStartY = 0, touchMoved = false;
@@ -1237,7 +1389,6 @@
             trendArea.addEventListener('touchmove', (e) => {
                 let diffX = Math.abs(e.touches[0].clientX - touchStartX);
                 let diffY = Math.abs(e.touches[0].clientY - touchStartY);
-                // 손가락이 10px 이상 움직인 경우 드래그로 식별
                 if (diffX > 10 || diffY > 10) {
                     touchMoved = true;
                 }
@@ -1247,19 +1398,45 @@
                 let diffX = e.changedTouches[0].clientX - touchStartX;
                 let diffY = e.changedTouches[0].clientY - touchStartY;
                 
-                // 가로 움직임이 크고 수직 비틀림이 낮을 때 안정적인 좌우 스와이프로 결정
                 if (Math.abs(diffX) > 35 && Math.abs(diffX) > Math.abs(diffY)) {
                     if (diffX < 0) {
-                        setTrendPage(1, true); // 왼쪽으로 밀면 -> 선택된 외화 정보 페이지
+                        setTrendPage(1, true); 
                     } else {
-                        setTrendPage(0, true); // 오른쪽으로 밀면 -> 기본 USD 달러 정보 페이지
+                        setTrendPage(0, true); 
                     }
                 } else if (!touchMoved) {
-                    // 터치가 이동하지 않고 단순히 가볍게 두드린(Tap) 경우에만 연동 그래프 팝업 발생
                     openTrendPopup();
                 }
             }, { passive: false });
+
+            // 바텀시트 스와이프해서 닫기 제스처 추가
+            const bottomSheet = document.querySelector('.trend-modal-content');
+            let sheetStartY = 0;
+            bottomSheet.addEventListener('touchstart', (e) => {
+                sheetStartY = e.touches[0].clientY;
+            }, { passive: true });
+
+            bottomSheet.addEventListener('touchmove', (e) => {
+                let currentY = e.touches[0].clientY;
+                let pullDistance = currentY - sheetStartY;
+                if (pullDistance > 0) {
+                    bottomSheet.style.transform = `translateY(${pullDistance}px)`;
+                }
+            }, { passive: true });
+
+            bottomSheet.addEventListener('touchend', (e) => {
+                let pullDistance = e.changedTouches[0].clientY - sheetStartY;
+                bottomSheet.style.transform = ''; // 인라인 스타일 복구
+                if (pullDistance > 100) {
+                    closeTrendPopup(); // 100px 이상 쓸어내리면 닫기
+                }
+            }, { passive: true });
         }
+
+        // [백그라운드에서 다시 복귀했을 때 즉시 오늘 날짜 환율을 재요청하는 핸들러]
+        document.addEventListener("resume", () => {
+            syncRateLoader(); // 앱 포커스 복귀 시 강제 리렌더링 및 환율 즉시 갱신
+        }, false);
 
         function initializeAppPipeline() { loadAppState(); changeEngineMode(systemViewMode); switchTab(currentTab, true); renderHistory(); initTrendTouchEvents(); syncRateLoader(); }
         document.addEventListener('deviceready', () => { initializeAppPipeline(); }, false);
