@@ -22,7 +22,21 @@
             --card-border: 1px solid rgba(255, 255, 255, 0.08);
         }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: -apple-system, BlinkMacSystemFont, "Malgun Gothic", sans-serif; margin: 0; padding: 0; }
-        body { background-color: var(--bg-main); color: var(--text-main); padding: 10px 12px 16px 12px; display: flex; flex-direction: column; gap: 10px; height: 100vh; overflow: hidden; }
+        
+        body { 
+            background-color: var(--bg-main); 
+            /* 백그라운드에 튀지 않는 극미세 오로라 레이어 추가 */
+            background-image: 
+                radial-gradient(circle at 15% 20%, rgba(168, 85, 247, 0.04) 0%, transparent 45%),
+                radial-gradient(circle at 85% 80%, rgba(37, 99, 235, 0.04) 0%, transparent 50%);
+            color: var(--text-main); 
+            padding: 10px 12px 16px 12px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 10px; 
+            height: 100vh; 
+            overflow: hidden; 
+        }
         
         .premium-panel { background: linear-gradient(145deg, var(--bg-panel-top) 0%, var(--bg-panel-bottom) 100%); border-radius: 14px; border: var(--card-border); box-shadow: var(--panel-shadow), inset 0 1px 2px rgba(255, 255, 255, 0.06); flex-shrink: 0; }
         
@@ -63,7 +77,30 @@
         .btn-refresh { background: linear-gradient(135deg, #374151, #1f2937); border: 1px solid rgba(255,255,255,0.06); }
         .btn-calc { background: linear-gradient(135deg, var(--accent-blue-start), var(--accent-blue-end)); border: 1px solid rgba(255,255,255,0.06); }
         
-        .result-container { display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 4px; padding: 12px 8px; background: linear-gradient(145deg, #161936 0%, #070812 100%); border: 2px solid rgba(255, 77, 77, 0.35); border-radius: 14px; width: 100%; overflow: hidden; box-shadow: var(--panel-shadow), inset 0 0 15px rgba(255, 77, 77, 0.08); flex-shrink: 0; }
+        /* 청구예정 결과 컨테이너 - 우아한 미세 호흡 글로우 애니메이션 추가 */
+        .result-container { 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            text-align: center; 
+            gap: 4px; 
+            padding: 12px 8px; 
+            background: linear-gradient(145deg, #161936 0%, #070812 100%); 
+            border: 2px solid rgba(255, 77, 77, 0.35); 
+            border-radius: 14px; 
+            width: 100%; 
+            overflow: hidden; 
+            box-shadow: var(--panel-shadow), inset 0 0 15px rgba(255, 77, 77, 0.08); 
+            flex-shrink: 0; 
+            animation: pulsePremiumBorder 4.5s infinite ease-in-out;
+        }
+        @keyframes pulsePremiumBorder {
+            0% { border-color: rgba(255, 77, 77, 0.35); box-shadow: var(--panel-shadow), inset 0 0 15px rgba(255, 77, 77, 0.08); }
+            50% { border-color: rgba(244, 114, 182, 0.55); box-shadow: var(--panel-shadow), 0 0 15px rgba(244, 114, 182, 0.15), inset 0 0 22px rgba(244, 114, 182, 0.12); }
+            100% { border-color: rgba(255, 77, 77, 0.35); box-shadow: var(--panel-shadow), inset 0 0 15px rgba(255, 77, 77, 0.08); }
+        }
+
         #final_res { font-size: 26px; font-weight: bold; color: var(--accent-red); text-shadow: 0 0 16px rgba(255, 77, 77, 0.4); white-space: nowrap; letter-spacing: -0.5px; }
         #buffer_res { font-size: 18px; font-weight: bold; color: #ff6b6b; white-space: nowrap; letter-spacing: -0.3px; }
         
@@ -175,7 +212,7 @@
         .trend-summary-value { font-size: 21px; font-weight: 900; color: var(--accent-green); letter-spacing: -0.5px; }
 
         .trend-stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; text-align: center; }
-        .trend-stat-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.04); border-radius: 10px; padding: 8px 4px; }
+        .trend-stat-card class { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.04); border-radius: 10px; padding: 8px 4px; }
         .trend-stat-label { font-size: 10px; color: var(--text-muted); margin-bottom: 2px; font-weight: bold; }
         .trend-stat-value { font-size: 13.5px; font-weight: 900; letter-spacing: -0.3px; }
         .trend-stat-card.max .trend-stat-value { color: var(--accent-red); }
@@ -212,7 +249,7 @@
         body.large-font-mode .pop-guide-item span { font-size: 16.5px !important; }
         body.large-font-mode .pop-guide-item span.foreign { font-size: 16.5px !important; padding-left: 14px; }
 
-        /* 반짝이 효과 전용 오버레이 스킨 (독립 배치 레이어) */
+        /* 반짝이 효과 전용 오버레이 스킨 (독립 배치 레이어) - 한층 고급스러운 형태로 고도화 */
         #sparkle-overlay {
             position: fixed;
             top: 0; left: 0;
@@ -223,15 +260,18 @@
         }
         .sparkle-particle {
             position: absolute;
-            border-radius: 50%;
+            /* 4각 별 모양을 Clip-path로 구현하여 최고급 가공 보석 느낌 연출 */
+            clip-path: polygon(50% 0%, 63% 38%, 100% 50%, 63% 62%, 50% 100%, 37% 62%, 0% 50%, 37% 38%);
             opacity: 0;
             will-change: transform, opacity;
             animation: twinkleEffect linear forwards;
         }
+        /* 느리고 우아하게 회전하며 흐려지는 디테일 애니메이션 */
         @keyframes twinkleEffect {
             0% { transform: scale(0) rotate(0deg); opacity: 0; }
-            50% { opacity: 0.8; }
-            100% { transform: scale(1.4) rotate(180deg); opacity: 0; }
+            45% { opacity: 0.95; transform: scale(1) rotate(90deg); }
+            55% { opacity: 0.95; transform: scale(1) rotate(90deg); }
+            100% { transform: scale(0) rotate(180deg); opacity: 0; }
         }
     </style>
 </head>
@@ -1162,38 +1202,43 @@
             }, { passive: false });
         }
 
-        /* 불규칙적 반짝이 생성 파이프라인 엔진 스크립트 */
+        /* 미니멀 프리미엄 별빛(Shimmer) 생성 파이프라인 엔진 스크립트 */
         function triggerDynamicSparkle() {
             const container = document.getElementById("sparkle-overlay");
             if (!container) return;
 
-            if (container.children.length > 25) return;
+            // 너무 많은 별이 화면을 뒤덮어 산만해지지 않도록 최대 동시 개수를 10개로 강력 제어
+            if (container.children.length > 10) return;
 
             const particle = document.createElement("div");
             particle.className = "sparkle-particle";
 
-            const pSize = Math.random() * 4 + 2;
+            // 정밀한 4각 별 형태가 시각적으로 잘 식별되는 6px ~ 12px 크기 할당
+            const pSize = Math.random() * 6 + 6;
             particle.style.width = `${pSize}px`;
             particle.style.height = `${pSize}px`;
 
-            particle.style.left = `${Math.random() * 100}vw`;
-            particle.style.top = `${Math.random() * 100}vh`;
+            // 액티브 요소나 사이드 엣지에 걸리지 않도록 적절히 패딩을 둔 임의 좌표 배치
+            particle.style.left = `${Math.random() * 90 + 5}vw`;
+            particle.style.top = `${Math.random() * 90 + 5}vh`;
 
-            const duration = Math.random() * 1.3 + 1.2;
+            // 매우 여유롭고 우아한 느낌을 유도하기 위해 회전 수명을 2.2초 ~ 4.5초로 느긋하게 조정
+            const duration = Math.random() * 2.3 + 2.2;
             particle.style.animationDuration = `${duration}s`;
 
+            // 앱 메인 UI 색상들과 기가 막히게 조화되는 럭셔리 파스텔 색조 목록
             const themeColors = [
-                "rgba(255, 255, 255, 0.95)", 
-                "rgba(56, 189, 248, 0.85)",   
-                "rgba(244, 114, 182, 0.85)",  
-                "rgba(168, 85, 247, 0.75)"    
+                "#ffffff",                    // 클래식 화이트 스타
+                "rgba(244, 114, 182, 0.95)",  // 테마 핑크 스타
+                "rgba(56, 189, 248, 0.95)",   // 트렌드 블루 스타
+                "rgba(168, 85, 247, 0.9)",    // 오로라 퍼플 스타
+                "rgba(253, 224, 71, 0.95)"    // 은은한 메탈릭 골드 스타
             ];
             const targetColor = themeColors[Math.floor(Math.random() * themeColors.length)];
 
-            particle.style.background = `radial-gradient(circle, ${targetColor} 0%, rgba(255,255,255,0) 80%)`;
-            if (Math.random() > 0.4) {
-                particle.style.boxShadow = `0 0 ${pSize * 2.5}px ${targetColor}`;
-            }
+            particle.style.background = targetColor;
+            // 미세 필터 드롭 섀도우를 인가하여 은은한 보석 가공 광채 연출
+            particle.style.filter = `drop-shadow(0 0 ${pSize * 0.4}px ${targetColor})`;
 
             container.appendChild(particle);
 
@@ -1205,7 +1250,8 @@
         function launchSparkleEngine() {
             const scheduleNext = () => {
                 triggerDynamicSparkle();
-                const dynamicInterval = Math.random() * 370 + 180;
+                // 생성 주기를 0.8초에서 2.2초 사이로 여유 있게 흐트러뜨려 시각적 피로도 원천 차단
+                const dynamicInterval = Math.random() * 1400 + 800;
                 setTimeout(scheduleNext, dynamicInterval);
             };
             scheduleNext();
