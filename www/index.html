@@ -2,6 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
+    <!-- Cordova 환경에 맞춘 보안 정책 설정 (Native HTTP 통신 허용) -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; media-src *; img-src 'self' data: content:; connect-src *;">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>The More for HJ</title>
@@ -95,10 +96,63 @@
         .guide-item span.arrow { text-align: center; color: var(--text-muted); font-size: 10px; }
         .guide-item span.foreign { text-align: left; color: #e2e8f0; padding-left: 2px; }
         
-        .guide-right-area { flex: 0.9; border-left: 1px solid rgba(255,255,255,0.08); padding-left: 12px; display: flex; flex-direction: column; justify-content: center; min-width: 0; }
-        .trend-title { font-size: 10.5px; color: var(--text-muted); margin-bottom: 3px; font-weight: bold; }
+        /* [우측 트렌드 영역 슬라이더 구조 개선 CSS] */
+        .guide-right-area { 
+            flex: 0.9; 
+            border-left: 1px solid rgba(255,255,255,0.08); 
+            padding-left: 12px; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            min-width: 0; 
+            position: relative; 
+            overflow: hidden;
+            user-select: none;
+        }
+        .trend-title { font-size: 10.5px; color: var(--text-muted); margin-bottom: 4px; font-weight: bold; }
+        
+        .trend-slider-viewport { 
+            overflow: hidden; 
+            width: 100%; 
+            position: relative;
+        }
+        .trend-slider-track { 
+            display: flex; 
+            width: 200%; /* 2페이지 수용 */
+            transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1); 
+            will-change: transform;
+        }
+        .trend-slide { 
+            width: 50%; 
+            flex-shrink: 0; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 3.5px; 
+        }
+        
         .trend-row { display: flex; justify-content: flex-start; font-size: 13.5px; font-weight: 700; color: #38bdf8; white-space: nowrap; gap: 8px; line-height: 1.4; }
         .trend-rate { color: var(--accent-green); min-width: 50px; }
+        
+        /* 하단 페이지 도트 스타일 정의 */
+        .trend-dots { 
+            display: flex; 
+            justify-content: center; 
+            gap: 5px; 
+            margin-top: 6px; 
+            flex-shrink: 0; 
+        }
+        .trend-dot { 
+            width: 4.5px; 
+            height: 4.5px; 
+            border-radius: 50%; 
+            background: rgba(255, 255, 255, 0.2); 
+            transition: all 0.25s ease; 
+        }
+        .trend-dot.active { 
+            background: #38bdf8; 
+            width: 11px; 
+            border-radius: 2.5px; 
+        }
         
         .history-panel { display: flex; flex-direction: column; gap: 5px; flex: 1; min-height: 0; background: transparent; }
         .history-header { display: flex; justify-content: space-between; align-items: center; padding: 0 2px; flex-shrink: 0; }
@@ -174,12 +228,18 @@
         body.large-font-mode .history-header h3 { font-size: 15px; }
         body.large-font-mode .clear-btn { font-size: 14px; }
         body.large-font-mode .log-box { font-size: 17px !important; font-weight: 800 !important; color: #ffffff !important; padding: 8px; line-height: 1.45; }
+        
         body.large-font-mode .guide-panel { order: 7; flex: 0.7; display: block; padding: 6px 10px; }
         body.large-font-mode .guide-right-area { display: none !important; }
         body.large-font-mode .guide-item { grid-template-columns: 115px 45px 1fr; background: rgba(255, 255, 255, 0.02); border-radius: 6px; margin-bottom: 2px; }
         body.large-font-mode .guide-item span { font-size: 19px !important; font-weight: 900 !important; }
         body.large-font-mode .guide-item span.arrow { font-size: 15px; color: var(--text-muted); }
         body.large-font-mode .guide-item span.foreign { color: var(--accent-green); font-size: 19px !important; }
+        
+        /* 큰글씨 대응을 위한 도트 크기 조절 */
+        body.large-font-mode .trend-dots { margin-top: 8px; }
+        body.large-font-mode .trend-dot { width: 6px; height: 6px; }
+        body.large-font-mode .trend-dot.active { width: 14px; }
 
         .trend-modal-overlay {
             display: none;
@@ -395,9 +455,22 @@
         <div class="guide-left-area" onclick="openGuidePopup(); event.stopPropagation();" style="cursor: pointer;">
             <div id="guide_grid" class="guide-grid"></div>
         </div>
-        <div class="guide-right-area" onclick="openTrendPopup(); event.stopPropagation();" style="cursor: pointer;">
-            <span class="trend-title">최근 추세 (USD)</span>
-            <div id="trend_list" class="trend-list"></div>
+        <!-- 우측 추세 영역: 인라인 onclick 제거, JS에서 정밀 터치/스와이프 핸들러로 수신함 -->
+        <div class="guide-right-area">
+            <span class="trend-title" id="trend_title">최근 추세 (USD)</span>
+            <div class="trend-slider-viewport">
+                <div class="trend-slider-track" id="trend_slider_track">
+                    <!-- USD 5일 추세 (0페이지) -->
+                    <div class="trend-slide" id="trend_slide_usd"></div>
+                    <!-- 선택 외화 5일 추세 (1페이지) -->
+                    <div class="trend-slide" id="trend_slide_sel"></div>
+                </div>
+            </div>
+            <!-- 페이지를 알려주는 2개의 하단 점(Dot) -->
+            <div class="trend-dots">
+                <span class="trend-dot active" id="dot_0"></span>
+                <span class="trend-dot" id="dot_1"></span>
+            </div>
         </div>
     </div>
     
@@ -412,6 +485,7 @@
         </div>
     </div>
 
+    <!-- 원화 구간별 최적 외화 테이블 12개 팝업 모달 -->
     <div id="guide_modal" class="guide-modal-overlay" onclick="closeGuidePopup()">
         <div class="guide-modal-content" onclick="closeGuidePopup(); event.stopPropagation();">
             <div class="guide-modal-title" id="pop_guide_title">구간별 최대 효율 외화 금액</div>
@@ -420,6 +494,7 @@
         </div>
     </div>
 
+    <!-- 환율 추세 30일 그래프 팝업 모달 -->
     <div id="trend_modal" class="trend-modal-overlay" onclick="closeTrendPopup()">
         <div class="trend-modal-content" onclick="closeTrendPopup(); event.stopPropagation();">
             <div class="trend-modal-title">공개 환율 사이트 정보 (themore.app과 차이있음)</div>
@@ -493,6 +568,9 @@
         let globalCachedUsdTt = 1350.00; 
         let currentVisaRatesMap = {}; 
 
+        // 추세 슬라이더 페이지 상태 관리 (0: USD, 1: 선택 외화)
+        let trendActivePage = 0;
+
         const rateInput = document.getElementById("rate_input"), amountInput = document.getElementById("amount_input");
         amountInput.addEventListener("keydown", function(e) { if (e.key === "Enter") { e.preventDefault(); calculateBilling(); this.blur(); } });
         
@@ -539,9 +617,45 @@
             return `${yyyy}-${mm}-${dd}`;
         }
 
+        // [스와이프 상태 적용 및 타이틀 변경 헬퍼]
+        function setTrendPage(pageIdx, isUserSwipe = false) {
+            trendActivePage = pageIdx;
+            const track = document.getElementById("trend_slider_track");
+            const title = document.getElementById("trend_title");
+            const info = getInfo();
+            const dot0 = document.getElementById("dot_0");
+            const dot1 = document.getElementById("dot_1");
+            
+            if (pageIdx === 0) {
+                track.style.transform = "translateX(0%)";
+                title.innerText = "최근 추세 (USD)";
+                dot0.classList.add("active");
+                dot1.classList.remove("active");
+            } else {
+                track.style.transform = "translateX(-50%)";
+                title.innerText = `최근 추세 (${info ? info.code : '외화'})`;
+                dot0.classList.remove("active");
+                dot1.classList.add("active");
+            }
+            
+            // 사용자가 의도적으로 스와이프할 때 네이티브 부드러운 햅틱 체감 구현
+            if (isUserSwipe && navigator && navigator.vibrate) {
+                navigator.vibrate(12); 
+            }
+        }
+
+        // [양측 슬라이드(USD, 선택외화)에 맞춘 5일 데이터 실시간 렌더링]
         function renderTrendList() { 
-            const container = document.getElementById("trend_list"); 
-            container.innerHTML = ""; 
+            const usdContainer = document.getElementById("trend_slide_usd"); 
+            const selContainer = document.getElementById("trend_slide_sel"); 
+            if (!usdContainer || !selContainer) return;
+            
+            usdContainer.innerHTML = ""; 
+            selContainer.innerHTML = ""; 
+            
+            const info = getInfo();
+            if(!info) return;
+
             let dateCursor = new Date(); 
             let addedCount = 0; 
             
@@ -554,19 +668,43 @@
                     let ymd = getParamDateStr(dateCursor);
                     let dateString = `${String(dateCursor.getMonth() + 1).padStart(2, '0')}/${String(dateCursor.getDate()).padStart(2, '0')}`; 
                     
-                    let calculatedDayRate = historyMap[ymd];
-                    if (!calculatedDayRate) {
-                        calculatedDayRate = (addedCount === 0) ? globalCachedUsdTt : (globalCachedUsdTt - (addedCount * 1.5));
+                    // 1. USD 일별 기준 환율
+                    let calculatedDayUsdRate = historyMap[ymd];
+                    if (!calculatedDayUsdRate) {
+                        calculatedDayUsdRate = (addedCount === 0) ? globalCachedUsdTt : (globalCachedUsdTt - (addedCount * 1.5));
                     }
                     
-                    let row = document.createElement("div"); 
-                    row.className = "trend-row"; 
-                    row.innerHTML = `<span class="trend-date">${dateString}</span> <span class="trend-rate">${calculatedDayRate.toFixed(1)}원</span>`; 
-                    container.appendChild(row); 
+                    let usdRow = document.createElement("div"); 
+                    usdRow.className = "trend-row"; 
+                    usdRow.innerHTML = `<span class="trend-date">${dateString}</span> <span class="trend-rate">${calculatedDayUsdRate.toFixed(1)}원</span>`; 
+                    usdContainer.appendChild(usdRow); 
+
+                    // 2. 선택 외화 일별 교차 환율 연산
+                    let calculatedDaySelRate = 0;
+                    if (info.code === "USD") {
+                        calculatedDaySelRate = calculatedDayUsdRate;
+                    } else if (currentVisaRatesMap && currentVisaRatesMap[info.code]) {
+                        const crossRate = currentVisaRatesMap[info.code];
+                        calculatedDaySelRate = crossRate * calculatedDayUsdRate * info.rate_unit;
+                    } else if (info.default) {
+                        calculatedDaySelRate = (info.default / info.rate_unit) * (calculatedDayUsdRate / 1350.00) * info.rate_unit;
+                    } else {
+                        calculatedDaySelRate = info.default;
+                    }
+
+                    let selRow = document.createElement("div");
+                    selRow.className = "trend-row";
+                    // 선택 외화는 세련된 핑크 계열 포인트 컬러 지정
+                    selRow.innerHTML = `<span class="trend-date">${dateString}</span> <span class="trend-rate" style="color: var(--accent-pink);">${calculatedDaySelRate.toFixed(1)}원</span>`;
+                    selContainer.appendChild(selRow);
+                    
                     addedCount++; 
                 } 
                 dateCursor.setDate(dateCursor.getDate() - 1); 
             } 
+            
+            // 슬라이더 텍스트 헤더와 점 활성화 동기화
+            setTrendPage(trendActivePage);
         }
 
         function syncHistoricalTrendList() {
@@ -874,9 +1012,23 @@
         
         function clearHistory() { historyLog = []; saveAppState(); renderHistory(); }
 
+        // [30일 그래프 팝업: USD/선택외화 모드별 이원화 연동 처리]
         function openTrendPopup() {
             const modal = document.getElementById("trend_modal");
             modal.style.display = "flex";
+            
+            const info = getInfo();
+            if (!info) return;
+
+            // 현재 스와이프 페이지가 0번이거나 선택 통화 자체가 USD인 경우 -> USD 모드 적용
+            const isUsdMode = (trendActivePage === 0 || info.code === "USD");
+            const modalTitle = document.querySelector(".trend-modal-title");
+            
+            if (isUsdMode) {
+                modalTitle.innerText = "공개 환율 사이트 정보 (themore.app과 차이있음)";
+            } else {
+                modalTitle.innerText = `공개 환율 사이트 정보 (${info.name} ${info.code}/KRW)`;
+            }
             
             const today = new Date();
             const endDate = getParamDateStr(today);
@@ -884,9 +1036,11 @@
             thirtyDaysAgo.setDate(today.getDate() - 30);
             const startDate = getParamDateStr(thirtyDaysAgo);
             
-            const url = `https://api.frankfurter.app/${startDate}..${endDate}?base=USD&symbols=KRW`;
+            // USD 모드이면 KRW만, 외화 모드이면 USD와 외화의 변동을 동시에 가져와 정밀 교차 연산
+            const symbolsParam = isUsdMode ? "KRW" : `KRW,${info.code}`;
+            const url = `https://api.frankfurter.app/${startDate}..${endDate}?base=USD&symbols=${symbolsParam}`;
 
-            // 오프라인 / 통신장애 대응: 오늘 날짜를 시드로 삼아, 매일 완벽하게 독립되고 유기적으로 변동하는 자연스러운 랜덤 워크(Random Walk) 합성 차트 생성
+            // 오프라인 / 통신장애 대응: LCG 선형합동 난수 알고리즘으로 무질서하게 왜곡되지 않는 환가 변동(Random Walk) 합성 차트 렌더링
             const runFallbackChart = () => {
                 let points = [];
                 let seed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
@@ -896,10 +1050,12 @@
                     return seed / 4294967296;
                 };
                 
+                const activeTodayRate = isUsdMode ? globalCachedUsdTt : rawNumericRate;
                 let tempRates = new Array(30);
-                tempRates[29] = globalCachedUsdTt;
+                tempRates[29] = activeTodayRate;
                 for (let i = 28; i >= 0; i--) {
-                    let step = (lcgRandom() - 0.48) * 7.0; 
+                    let stepSize = (activeTodayRate / 1350.0) * 7.0;
+                    let step = (lcgRandom() - 0.48) * stepSize; 
                     tempRates[i] = tempRates[i+1] + step;
                 }
                 
@@ -920,11 +1076,13 @@
                     if (p.rate < minObj.rate) minObj = p; 
                 });
                 
+                const activeTodayRate = isUsdMode ? globalCachedUsdTt : rawNumericRate;
+                
                 document.getElementById("pop_max_rate").innerText = maxObj.rate.toFixed(2) + "원";
                 document.getElementById("pop_max_date").innerText = maxObj.dateStr;
                 document.getElementById("pop_min_rate").innerText = minObj.rate.toFixed(2) + "원";
                 document.getElementById("pop_min_date").innerText = minObj.dateStr;
-                document.getElementById("pop_today_rate").innerText = globalCachedUsdTt.toFixed(2) + "원";
+                document.getElementById("pop_today_rate").innerText = activeTodayRate.toFixed(2) + "원";
                 
                 const svgW = 320, svgH = 110;
                 const paddingLeft = 14, paddingRight = 14, paddingTop = 16, paddingBottom = 16;
@@ -948,14 +1106,24 @@
                 let polylinePath = pathCoords.join(" ");
                 let areaPath = `${paddingLeft},${svgH - paddingBottom} ` + polylinePath + ` ${svgW - paddingRight},${svgH - paddingBottom}`;
                 
+                // [프리미엄 아이디어]: USD는 블루 테마, 선택 외화는 핑크 테마로 차트 스킨 스위칭
+                const chartStrokeColor = isUsdMode ? "#38bdf8" : "var(--accent-pink)";
+                const areaStopColor = isUsdMode ? "#38bdf8" : "var(--accent-pink)";
+                const dropShadowFilter = isUsdMode ? "rgba(56,189,248,0.45)" : "rgba(244,114,182,0.45)";
+
                 document.getElementById("pop_chart_box").innerHTML = `
                     <svg viewBox="0 0 ${svgW} ${svgH}" style="width:100%; height:100%; overflow:visible;">
-                        <defs><linearGradient id="popGlow" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#38bdf8" stop-opacity="0.25"/><stop offset="100%" stop-color="#38bdf8" stop-opacity="0.0"/></linearGradient></defs>
+                        <defs>
+                            <linearGradient id="popGlow" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stop-color="${areaStopColor}" stop-opacity="0.25"/>
+                                <stop offset="100%" stop-color="${areaStopColor}" stop-opacity="0.0"/>
+                            </linearGradient>
+                        </defs>
                         <line x1="${paddingLeft}" y1="${paddingTop}" x2="${svgW-paddingRight}" y2="${paddingTop}" stroke="rgba(255,255,255,0.04)" stroke-dasharray="2,2"/>
                         <line x1="${paddingLeft}" y1="${svgH/2}" x2="${svgW-paddingRight}" y2="${svgH/2}" stroke="rgba(255,255,255,0.04)" stroke-dasharray="2,2"/>
                         <line x1="${paddingLeft}" y1="${svgH-paddingBottom}" x2="${svgW-paddingRight}" y2="${svgH-paddingBottom}" stroke="rgba(255,255,255,0.08)"/>
                         <polygon points="${areaPath}" fill="url(#popGlow)"/>
-                        <polyline points="${polylinePath}" fill="none" stroke="#38bdf8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0px 2px 5px rgba(56,189,248,0.45));"/>
+                        <polyline points="${polylinePath}" fill="none" stroke="${chartStrokeColor}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0px 2px 5px ${dropShadowFilter});"/>
                         <text x="${paddingLeft}" y="${svgH - 2}" fill="var(--text-muted)" font-size="8.5" font-weight="bold">${points[0].dateStr}</text>
                         <text x="${svgW - paddingRight}" y="${svgH - 2}" fill="var(--text-muted)" font-size="8.5" font-weight="bold" text-anchor="end">오늘(${points[29].dateStr})</text>
                         ${markersHtml}
@@ -969,7 +1137,8 @@
                 }
                 
                 let points = [];
-                let lastKnownRate = globalCachedUsdTt / 1.0095;
+                let lastKnownUsdRate = globalCachedUsdTt / 1.0095;
+                let lastKnownCrossRate = isUsdMode ? 1 : (rawNumericRate / globalCachedUsdTt / info.rate_unit);
                 
                 for (let i = 29; i >= 0; i--) {
                     let d = new Date(today.getTime());
@@ -979,35 +1148,54 @@
                     const dd = String(d.getDate()).padStart(2, '0');
                     const dateStr = `${mm}/${dd}`;
                     
-                    let rateVal = lastKnownRate;
-                    if (data.rates[ymd] && data.rates[ymd]["KRW"]) {
-                        rateVal = data.rates[ymd]["KRW"];
-                        lastKnownRate = rateVal;
+                    let usdRateVal = lastKnownUsdRate;
+                    let crossRateVal = lastKnownCrossRate;
+                    
+                    if (data.rates[ymd]) {
+                        if (data.rates[ymd]["KRW"]) {
+                            usdRateVal = data.rates[ymd]["KRW"];
+                            lastKnownUsdRate = usdRateVal;
+                        }
+                        if (!isUsdMode && data.rates[ymd][info.code]) {
+                            crossRateVal = 1 / data.rates[ymd][info.code];
+                            lastKnownCrossRate = crossRateVal;
+                        }
                     } else {
-                        let historyMap = {};
-                        try { historyMap = JSON.parse(localStorage.getItem("themore_usd_history_map") || "{}"); } catch(e) {}
-                        if (historyMap[ymd]) {
-                            rateVal = historyMap[ymd] / 1.0095;
-                        } else {
-                            let found = false;
-                            for (let offset = 1; offset <= 5; offset++) {
-                                let checkD = new Date(d.getTime());
-                                checkD.setDate(d.getDate() - offset);
-                                let checkYmd = getParamDateStr(checkD);
-                                if (data.rates[checkYmd] && data.rates[checkYmd]["KRW"]) {
-                                    rateVal = data.rates[checkYmd]["KRW"];
-                                    found = true;
-                                    break;
+                        let found = false;
+                        for (let offset = 1; offset <= 5; offset++) {
+                            let checkD = new Date(d.getTime());
+                            checkD.setDate(d.getDate() - offset);
+                            let checkYmd = getParamDateStr(checkD);
+                            if (data.rates[checkYmd]) {
+                                if (data.rates[checkYmd]["KRW"]) {
+                                    usdRateVal = data.rates[checkYmd]["KRW"];
                                 }
+                                if (!isUsdMode && data.rates[checkYmd][info.code]) {
+                                    crossRateVal = 1 / data.rates[checkYmd][info.code];
+                                }
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found) {
+                            let historyMap = {};
+                            try { historyMap = JSON.parse(localStorage.getItem("themore_usd_history_map") || "{}"); } catch(e) {}
+                            if (historyMap[ymd]) {
+                                usdRateVal = historyMap[ymd] / 1.0095;
                             }
                         }
                     }
                     
-                    let finalRate = rateVal * 1.0095;
-                    points.push({ dateStr: dateStr, rate: finalRate });
+                    let finalCalculatedRate = 0;
+                    if (isUsdMode) {
+                        finalCalculatedRate = usdRateVal * 1.0095;
+                    } else {
+                        finalCalculatedRate = (usdRateVal * 1.0095) * crossRateVal * info.rate_unit;
+                    }
+                    points.push({ dateStr: dateStr, rate: finalCalculatedRate });
                 }
                 
-                points[29].rate = globalCachedUsdTt;
+                points[29].rate = isUsdMode ? globalCachedUsdTt : rawNumericRate;
                 renderChartWithPoints(points);
             };
 
@@ -1034,7 +1222,46 @@
         function toggleTrendPopup() { const modal = document.getElementById("trend_modal"); if(modal.style.display === "flex") closeTrendPopup(); else openTrendPopup(); }
         function closeTrendPopup() { document.getElementById("trend_modal").style.display = "none"; }
         
-        function initializeAppPipeline() { loadAppState(); changeEngineMode(systemViewMode); switchTab(currentTab, true); renderHistory(); syncRateLoader(); }
+        // [정밀 터치 디스패처: 스와이프 제스처와 단순 탭 터치 완벽 분리 구현]
+        let touchStartX = 0, touchStartY = 0, touchMoved = false;
+        function initTrendTouchEvents() {
+            const trendArea = document.querySelector('.guide-right-area');
+            if (!trendArea) return;
+            
+            trendArea.addEventListener('touchstart', (e) => {
+                touchStartX = e.touches[0].clientX;
+                touchStartY = e.touches[0].clientY;
+                touchMoved = false;
+            }, { passive: true });
+            
+            trendArea.addEventListener('touchmove', (e) => {
+                let diffX = Math.abs(e.touches[0].clientX - touchStartX);
+                let diffY = Math.abs(e.touches[0].clientY - touchStartY);
+                // 손가락이 10px 이상 움직인 경우 드래그로 식별
+                if (diffX > 10 || diffY > 10) {
+                    touchMoved = true;
+                }
+            }, { passive: true });
+            
+            trendArea.addEventListener('touchend', (e) => {
+                let diffX = e.changedTouches[0].clientX - touchStartX;
+                let diffY = e.changedTouches[0].clientY - touchStartY;
+                
+                // 가로 움직임이 크고 수직 비틀림이 낮을 때 안정적인 좌우 스와이프로 결정
+                if (Math.abs(diffX) > 35 && Math.abs(diffX) > Math.abs(diffY)) {
+                    if (diffX < 0) {
+                        setTrendPage(1, true); // 왼쪽으로 밀면 -> 선택된 외화 정보 페이지
+                    } else {
+                        setTrendPage(0, true); // 오른쪽으로 밀면 -> 기본 USD 달러 정보 페이지
+                    }
+                } else if (!touchMoved) {
+                    // 터치가 이동하지 않고 단순히 가볍게 두드린(Tap) 경우에만 연동 그래프 팝업 발생
+                    openTrendPopup();
+                }
+            }, { passive: false });
+        }
+
+        function initializeAppPipeline() { loadAppState(); changeEngineMode(systemViewMode); switchTab(currentTab, true); renderHistory(); initTrendTouchEvents(); syncRateLoader(); }
         document.addEventListener('deviceready', () => { initializeAppPipeline(); }, false);
         window.addEventListener('DOMContentLoaded', () => { setTimeout(() => { if(typeof cordova === "undefined") initializeAppPipeline(); }, 600); });
    </script>
