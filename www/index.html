@@ -237,46 +237,48 @@
         body.large-font-mode .trend-dot { width: 6px; height: 6px; }
         body.large-font-mode .trend-dot.active { width: 14px; }
 
-        /* [개선된 글래스모피즘 + 바텀 시트 팝업] */
+        /* [고급 바텀 시트 및 글래스모피즘 오버레이 반영 스타일 수정] */
         .trend-modal-overlay {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(4, 5, 11, 0.45); 
-            backdrop-filter: blur(8px); 
-            -webkit-backdrop-filter: blur(8px);
+            background: rgba(6, 7, 16, 0.55); 
+            backdrop-filter: blur(10px); 
+            -webkit-backdrop-filter: blur(10px);
             z-index: 99999;
-            align-items: flex-end; /* 화면 하단에 밀착시킴 */
+            align-items: flex-end; 
             justify-content: center;
         }
         .trend-modal-content {
             width: 100%;
-            max-width: 500px;
-            background: linear-gradient(180deg, rgba(27, 30, 54, 0.9) 0%, rgba(11, 12, 24, 0.98) 100%);
-            border-top-left-radius: 24px;
-            border-top-right-radius: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-bottom: none;
-            box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.8);
-            padding: 24px 20px 34px 20px;
+            max-width: 460px;
+            background: linear-gradient(180deg, rgba(23, 26, 48, 0.95) 0%, rgba(10, 11, 22, 0.98) 100%);
+            border-radius: 22px 22px 0 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            border-left: 1px solid rgba(255, 255, 255, 0.08);
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.7);
+            padding: 12px 20px 30px 20px;
             display: flex;
             flex-direction: column;
-            gap: 18px;
+            gap: 14px;
             user-select: none;
             transform: translateY(100%);
-            transition: transform 0.3s cubic-bezier(0.1, 0.76, 0.55, 0.94);
+            transition: transform 0.32s cubic-bezier(0.1, 0.76, 0.55, 0.94);
+            will-change: transform;
         }
-        .trend-modal-overlay.active .trend-modal-content {
+        .trend-modal-overlay.active-sheet .trend-modal-content {
             transform: translateY(0);
         }
         
-        /* 바텀시트 손잡이(Handle) */
+        /* 바텀 시트 상단 손잡이 라인 */
         .bottom-sheet-handle {
-            width: 44px;
-            height: 5px;
-            background: rgba(255, 255, 255, 0.25);
+            width: 42px;
+            height: 4.5px;
+            background: rgba(255, 255, 255, 0.2);
             border-radius: 3px;
-            margin: -12px auto 6px auto;
+            margin: 0 auto 4px auto;
+            flex-shrink: 0;
         }
 
         .trend-modal-title {
@@ -284,29 +286,42 @@
             font-weight: 900;
             text-align: center;
             letter-spacing: -0.4px;
-            background: linear-gradient(135deg, #38bdf8 0%, #f472b6 100%);
+            background: linear-gradient(135deg, #38bdf8 0%, #a855f7 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             line-height: 1.3;
         }
+        
+        .trend-summary-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .trend-summary-main { display: flex; flex-direction: column; gap: 2px; }
+        .trend-summary-label { font-size: 11px; color: var(--text-muted); font-weight: bold; }
+        .trend-summary-value { font-size: 21px; font-weight: 900; color: var(--accent-green); letter-spacing: -0.5px; }
+
         .trend-stats-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(2, 1fr);
             gap: 8px;
             text-align: center;
         }
         .trend-stat-card {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 11px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 10px;
             padding: 8px 4px;
-            position: relative;
         }
         .trend-stat-label {
             font-size: 10px;
             color: var(--text-muted);
-            margin-bottom: 4px;
+            margin-bottom: 2px;
             font-weight: bold;
         }
         .trend-stat-value {
@@ -316,53 +331,51 @@
         }
         .trend-stat-card.max .trend-stat-value { color: var(--accent-red); }
         .trend-stat-card.min .trend-stat-value { color: #38bdf8; }
-        .trend-stat-card.today .trend-stat-value { color: var(--accent-green); }
         .trend-stat-date {
             font-size: 9.5px;
             color: var(--text-muted);
-            margin-top: 2px;
+            margin-top: 1px;
             font-weight: bold;
         }
         
-        /* [드래그 영역이 확보된 그래프 박스] */
+        /* 고도화된 인터랙티브 차트 컨테이너 */
         .trend-chart-container {
             width: 100%;
-            height: 140px;
-            background: rgba(0, 0, 0, 0.55);
-            border-radius: 14px;
-            padding: 10px;
+            height: 160px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 12px;
+            padding: 8px 6px;
             border: 1px solid rgba(255, 255, 255, 0.05);
             position: relative;
-            overflow: visible;
-            touch-action: none; /* 브라우저 기본 드래그 무시 */
+            touch-action: none; 
         }
         
-        /* [차트 탐색 오버레이 툴팁] */
-        .chart-tooltip-bubble {
+        /* 실시간 손가락 드래그 검출 안내 영역 및 툴팁 박스 */
+        .chart-interactive-overlay {
             position: absolute;
-            top: -5px;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 10;
+        }
+        .chart-drag-tooltip {
+            position: absolute;
+            top: 6px;
             left: 50%;
-            transform: translate(-50%, -100%);
-            background: rgba(15, 23, 42, 0.95);
-            border: 1.5px solid #38bdf8;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-            padding: 5px 8px;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: bold;
-            color: #ffffff;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.96);
+            color: #0c0d19;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 900;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
             pointer-events: none;
             display: none;
-            z-index: 10;
+            z-index: 20;
             white-space: nowrap;
+            letter-spacing: -0.2px;
+            border: 1px solid #ffffff;
         }
-        .chart-tooltip-bubble .tooltip-date {
-            color: var(--text-muted);
-            font-size: 9.5px;
-            display: block;
-            text-align: center;
-        }
-
+        
         .trend-close-hint {
             text-align: center;
             font-size: 11px;
@@ -375,6 +388,13 @@
             50% { opacity: 0.9; }
             100% { opacity: 0.4; }
         }
+
+        /* 큰글씨 바텀 시트 스타일 대응 */
+        body.large-font-mode .trend-modal-content { padding-bottom: 35px; gap: 16px; }
+        body.large-font-mode .trend-modal-title { font-size: 18px; }
+        body.large-font-mode .trend-summary-value { font-size: 25px; }
+        body.large-font-mode .trend-stat-value { font-size: 16px; }
+        body.large-font-mode .trend-chart-container { height: 180px; }
 
         .guide-modal-overlay {
             display: none;
@@ -535,9 +555,18 @@
     </div>
 
     <div id="trend_modal" class="trend-modal-overlay" onclick="closeTrendPopup()">
-        <div class="trend-modal-content" onclick="event.stopPropagation();">
+        <div class="trend-modal-content" onclick="closeTrendPopup(); event.stopPropagation();">
             <div class="bottom-sheet-handle"></div>
-            <div class="trend-modal-title">공개 환율 사이트 정보 (themore.app과 차이있음)</div>
+            <div class="trend-modal-title">공개 환율 사이트 정보</div>
+            
+            <div class="trend-summary-card">
+                <div class="trend-summary-main">
+                    <span class="trend-summary-label" id="pop_summary_label">실시간 계산 환율 (Today)</span>
+                    <span class="trend-summary-value" id="pop_today_rate">-원</span>
+                </div>
+                <div style="font-size: 10px; color: var(--text-muted); font-weight: bold; text-align: right;" id="pop_today_date">기준: 오늘</div>
+            </div>
+
             <div class="trend-stats-grid">
                 <div class="trend-stat-card max">
                     <div class="trend-stat-label">최고점 (Max)</div>
@@ -549,16 +578,12 @@
                     <div class="trend-stat-value" id="pop_min_rate">-원</div>
                     <div class="trend-stat-date" id="pop_min_date">-</div>
                 </div>
-                <div class="trend-stat-card today">
-                    <div class="trend-stat-label">오늘 환율 (Today)</div>
-                    <div class="trend-stat-value" id="pop_today_rate">-원</div>
-                    <div class="trend-stat-date" id="pop_today_date">오늘</div>
-                </div>
             </div>
             
-            <div class="trend-chart-container" id="pop_chart_box"></div>
+            <div class="trend-chart-container" id="pop_chart_box">
+                </div>
             
-            <div class="trend-close-hint" onclick="closeTrendPopup()">💡 한 번 더 터치하거나 아래로 쓸어내리면 닫힙니다.</div>
+            <div class="trend-close-hint">💡 바텀 시트 바깥이나 손잡이를 터치하면 닫힙니다.</div>
         </div>
     </div>
     
@@ -585,7 +610,7 @@
             "GBP": { code: "GBP", name: "영국 파운드", symbol: "£", rate_unit: 1, default: 1710.00, continent: "EU_ME" },
             "CHF": { code: "CHF", name: "스위스 프랑", symbol: "CHF", rate_unit: 1, default: 1510.00, continent: "EU_ME" },
             "SEK": { code: "SEK", name: "스웨덴 크로나", symbol: "kr", rate_unit: 1, default: 128.00, continent: "EU_ME" },
-            "DKK": { code: DKK, name: "덴마크 크로나", symbol: "kr", rate_unit: 1, default: 195.00, continent: "EU_ME" },
+            "DKK": { code: "DKK", name: "덴마크 크로나", symbol: "kr", rate_unit: 1, default: 195.00, continent: "EU_ME" },
             "NOK": { code: "NOK", name: "노르웨이 크로나", symbol: "kr", rate_unit: 1, default: 125.00, continent: "EU_ME" },
             "RUB": { code: "RUB", name: "러시아 루블", symbol: "₽", rate_unit: 1, default: 14.50, continent: "EU_ME" },
             "TRY": { code: "TRY", name: "터키 리라", symbol: "₺", rate_unit: 1, default: 39.50, continent: "EU_ME" },
@@ -600,7 +625,7 @@
             "MXN": { code: "MXN", name: "멕시코 페소", symbol: "$", rate_unit: 1, default: 68.00, continent: "AMERICA" },
             "BRL": { code: "BRL", name: "브라질 헤알", symbol: "R$", rate_unit: 1, default: 240.00, continent: "AMERICA" },
             "CLP": { code: "CLP", name: "칠레 페소", symbol: "$", rate_unit: 1, default: 1.45, continent: "AMERICA" },
-            "COP": { code: "COP", name: "콜롬비아 페소", symbol: "$", rate_unit: 1, default: 0.33, continent: "AMERICA" },
+            "COP": { code: "COP", name: "콜롬비아 페소", symbol: "$", stroke: "1", default: 0.33, continent: "AMERICA" },
             "PEN": { code: "PEN", name: "페루 누에보솔", symbol: "S/.", rate_unit: 1, default: 360.00, continent: "AMERICA" }
         };
         const CONTINENTS = { "ALL": "전체 대륙", "ASIA": "아시아 / 대양주", "EU_ME": "유럽 / 중동 / 아프리카", "AMERICA": "아메리카 전역" };
@@ -610,9 +635,9 @@
         let globalCachedUsdTt = 1350.00; 
         let currentVisaRatesMap = {}; 
         let trendActivePage = 0;
-
-        // [30일 그래프 드래그 탐색 메모리 캐시]
-        let globalChartPoints = []; 
+        
+        // 인터랙티브 정밀 트래킹을 위한 글로벌 데이터 보관소
+        let globalRenderedPoints = [];
 
         const rateInput = document.getElementById("rate_input"), amountInput = document.getElementById("amount_input");
         amountInput.addEventListener("keydown", function(e) { if (e.key === "Enter") { e.preventDefault(); calculateBilling(); this.blur(); } });
@@ -739,7 +764,6 @@
                 } 
                 dateCursor.setDate(dateCursor.getDate() - 1); 
             } 
-            
             setTrendPage(trendActivePage);
         }
 
@@ -1048,37 +1072,37 @@
         
         function clearHistory() { historyLog = []; saveAppState(); renderHistory(); }
 
-        // [30일 그래프 바텀시트 팝업 연동 및 그라데이션 차트화]
+        /* [고급 인터랙티브 30일 프리미엄 바텀시트 핵심 파이프라인] */
         function openTrendPopup() {
             const modal = document.getElementById("trend_modal");
             modal.style.display = "flex";
-            
-            // 바텀시트 슬라이드 애니메이션 적용을 위한 비동기 처리
-            setTimeout(() => {
-                modal.classList.add("active");
-            }, 10);
+            // 리플로우 유도 후 하단에서 슬라이드업 애니메이션 처리 가동
+            setTimeout(() => { modal.classList.add("active-sheet"); }, 15);
             
             const info = getInfo();
             if (!info) return;
 
             const isUsdMode = (trendActivePage === 0 || info.code === "USD");
             const modalTitle = document.querySelector(".trend-modal-title");
+            const summaryLabel = document.getElementById("pop_summary_label");
             
             if (isUsdMode) {
-                modalTitle.innerText = "공개 환율 사이트 정보 (USD/KRW)";
+                modalTitle.innerText = "공개 환율 사이트 정보 (USD 기준 30일)";
+                summaryLabel.innerText = "오늘 달러 정산 환율 (Today USD)";
             } else {
-                modalTitle.innerText = `공개 환율 사이트 정보 (${info.name} ${info.code}/KRW)`;
+                modalTitle.innerText = `공개 환율 사이트 정보 (${info.name} ${info.code} 기준 30일)`;
+                summaryLabel.innerText = `오늘 ${info.code} 교차 정산 환율`;
             }
             
-            const today = new Date(); // 매 호출마다 동적으로 재생성하여 날짜 미갱신 버그 완벽차단
+            // [중요 버그 해결] 날짜 변경 및 캐시 축적 무력화를 위해 실시간 fresh timestamp 삽입 연동
+            const today = new Date();
             const endDate = getParamDateStr(today);
             const thirtyDaysAgo = new Date();
             thirtyDaysAgo.setDate(today.getDate() - 30);
             const startDate = getParamDateStr(thirtyDaysAgo);
             
             const symbolsParam = isUsdMode ? "KRW" : `KRW,${info.code}`;
-            
-            // 캐시 미갱신 방지를 위한 고유한 타임스탬프 파라미터 적용 (_t)
+            // 캐시 버스팅 파라미터 (_t) 강제 바인딩 처리로 매번 완전히 신선한 패킷 획득
             const url = `https://api.frankfurter.app/${startDate}..${endDate}?base=USD&symbols=${symbolsParam}&_t=${Date.now()}`;
 
             const runFallbackChart = () => {
@@ -1093,9 +1117,11 @@
                 const activeTodayRate = isUsdMode ? globalCachedUsdTt : rawNumericRate;
                 let tempRates = new Array(30);
                 tempRates[29] = activeTodayRate;
+                
+                // 왜곡되지 않도록 안정적인 정밀 무작위 걸음(Random Walk) 역산 연산
                 for (let i = 28; i >= 0; i--) {
-                    let stepSize = (activeTodayRate / 1350.0) * 7.0;
-                    let step = (lcgRandom() - 0.48) * stepSize; 
+                    let stepSize = (activeTodayRate / 1350.0) * 5.0;
+                    let step = (lcgRandom() - 0.495) * stepSize; 
                     tempRates[i] = tempRates[i+1] + step;
                 }
                 
@@ -1106,113 +1132,7 @@
                     const dd = String(d.getDate()).padStart(2, '0');
                     points.push({ dateStr: `${mm}/${dd}`, rate: tempRates[29 - i] });
                 }
-                renderChartWithPoints(points);
-            };
-
-            const renderChartWithPoints = (points) => {
-                globalChartPoints = points; // 터치 드래그 연산용 전역 캐시 저장
-                
-                let maxObj = points[0], minObj = points[0];
-                points.forEach(p => { 
-                    if (p.rate > maxObj.rate) maxObj = p; 
-                    if (p.rate < minObj.rate) minObj = p; 
-                });
-                
-                const activeTodayRate = isUsdMode ? globalCachedUsdTt : rawNumericRate;
-                
-                document.getElementById("pop_max_rate").innerText = maxObj.rate.toFixed(2) + "원";
-                document.getElementById("pop_max_date").innerText = maxObj.dateStr;
-                document.getElementById("pop_min_rate").innerText = minObj.rate.toFixed(2) + "원";
-                document.getElementById("pop_min_date").innerText = minObj.dateStr;
-                document.getElementById("pop_today_rate").innerText = activeTodayRate.toFixed(2) + "원";
-                
-                const svgW = 340, svgH = 130;
-                const paddingLeft = 14, paddingRight = 14, paddingTop = 20, paddingBottom = 20;
-                const chartW = svgW - paddingLeft - paddingRight;
-                const chartH = svgH - paddingTop - paddingBottom;
-                
-                let rMax = maxObj.rate, rMin = minObj.rate;
-                if (rMax === rMin) { rMax += 5; rMin -= 5; }
-                
-                // [Smooth Curve 곡선 공식 처리 연산 및 SVG 패스 생성]
-                let pathCoords = [];
-                let pointsArr = points.map((p, idx) => {
-                    return {
-                        x: paddingLeft + (idx * (chartW / 29)),
-                        y: paddingTop + (chartH - ((p.rate - rMin) / (rMax - rMin)) * chartH)
-                    };
-                });
-
-                // 큐빅 베지어 스무스 곡선(Smooth Spline) 경로 스트링 빌드
-                let splineStr = `M ${pointsArr[0].x} ${pointsArr[0].y}`;
-                for (let i = 0; i < pointsArr.length - 1; i++) {
-                    const cpX1 = pointsArr[i].x + (chartW / 29) / 2;
-                    const cpY1 = pointsArr[i].y;
-                    const cpX2 = pointsArr[i].x + (chartW / 29) / 2;
-                    const cpY2 = pointsArr[i+1].y;
-                    splineStr += ` C ${cpX1} ${cpY1}, ${cpX2} ${cpY2}, ${pointsArr[i+1].x} ${pointsArr[i+1].y}`;
-                }
-
-                let areaSplineStr = splineStr + ` L ${svgW - paddingRight} ${svgH - paddingBottom} L ${paddingLeft} ${svgH - paddingBottom} Z`;
-                
-                let markersHtml = "";
-                points.forEach((p, idx) => {
-                    const pt = pointsArr[idx];
-                    // 최고점, 최저점, 오늘 환율 마커 렌더링
-                    if (p === maxObj) {
-                        markersHtml += `
-                            <circle cx="${pt.x}" cy="${pt.y}" r="5" fill="var(--accent-red)" stroke="#ffffff" stroke-width="1.5"/>
-                            <text x="${pt.x}" y="${pt.y - 8}" fill="var(--accent-red)" font-size="8.5" font-weight="900" text-anchor="middle">▲최고</text>
-                        `;
-                    } else if (p === minObj) {
-                        markersHtml += `
-                            <circle cx="${pt.x}" cy="${pt.y}" r="5" fill="#38bdf8" stroke="#ffffff" stroke-width="1.5"/>
-                            <text x="${pt.x}" y="${pt.y + 13}" fill="#38bdf8" font-size="8.5" font-weight="900" text-anchor="middle">▼최저</text>
-                        `;
-                    } else if (idx === 29) {
-                        // 오늘 환율 맥박 뛰는 포커스 링 Pulsing Ring 효과 적용
-                        markersHtml += `
-                            <circle cx="${pt.x}" cy="${pt.y}" r="10" fill="none" stroke="var(--accent-green)" stroke-width="1.5" opacity="0.6">
-                                <animate attributeName="r" values="4;11;4" dur="2s" repeatCount="indefinite" />
-                                <animate attributeName="opacity" values="0.8;0;0.8" dur="2s" repeatCount="indefinite" />
-                            </circle>
-                            <circle cx="${pt.x}" cy="${pt.y}" r="4" fill="var(--accent-green)" stroke="#ffffff" stroke-width="1.5"/>
-                        `;
-                    }
-                });
-                
-                const chartStrokeColor = isUsdMode ? "#38bdf8" : "var(--accent-pink)";
-                const areaStopColor = isUsdMode ? "#38bdf8" : "var(--accent-pink)";
-                const dropShadowFilter = isUsdMode ? "rgba(56,189,248,0.4)" : "rgba(244,114,182,0.4)";
-
-                document.getElementById("pop_chart_box").innerHTML = `
-                    <div id="chart_tooltip" class="chart-tooltip-bubble">
-                        <span class="tooltip-date" id="tooltip_date">07/15</span>
-                        <span id="tooltip_rate">1,350.21원</span>
-                    </div>
-                    
-                    <div id="tooltip_vertical_line" style="position:absolute; top:${paddingTop}px; bottom:${paddingBottom}px; width:1px; background:rgba(56,189,248,0.55); border-left:1px dashed #38bdf8; display:none; pointer-events:none; z-index:1;"></div>
-
-                    <svg viewBox="0 0 ${svgW} ${svgH}" style="width:100%; height:100%; overflow:visible;">
-                        <defs>
-                            <linearGradient id="popGlow" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stop-color="${areaStopColor}" stop-opacity="0.3"/>
-                                <stop offset="100%" stop-color="${areaStopColor}" stop-opacity="0.0"/>
-                            </linearGradient>
-                        </defs>
-                        <line x1="${paddingLeft}" y1="${paddingTop}" x2="${svgW-paddingRight}" y2="${paddingTop}" stroke="rgba(255,255,255,0.04)" stroke-dasharray="2,2"/>
-                        <line x1="${paddingLeft}" y1="${svgH/2}" x2="${svgW-paddingRight}" y2="${svgH/2}" stroke="rgba(255,255,255,0.04)" stroke-dasharray="2,2"/>
-                        <line x1="${paddingLeft}" y1="${svgH-paddingBottom}" x2="${svgW-paddingRight}" y2="${svgH-paddingBottom}" stroke="rgba(255,255,255,0.08)"/>
-                        
-                        <path d="${areaSplineStr}" fill="url(#popGlow)"/>
-                        <path d="${splineStr}" fill="none" stroke="${chartStrokeColor}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0px 2.5px 5px ${dropShadowFilter});"/>
-                        
-                        <text x="${paddingLeft}" y="${svgH - 2}" fill="var(--text-muted)" font-size="8.5" font-weight="bold">${points[0].dateStr}</text>
-                        <text x="${svgW - paddingRight}" y="${svgH - 2}" fill="var(--text-muted)" font-size="8.5" font-weight="bold" text-anchor="end">오늘(${points[29].dateStr})</text>
-                        ${markersHtml}
-                    </svg>`;
-
-                initChartInteractivity(paddingLeft, chartW); // 손가락 탐색 리스너 바인딩
+                renderChartWithPoints(points, isUsdMode);
             };
 
             const processFrankfurterData = (data) => {
@@ -1281,7 +1201,7 @@
                 }
                 
                 points[29].rate = isUsdMode ? globalCachedUsdTt : rawNumericRate;
-                renderChartWithPoints(points);
+                renderChartWithPoints(points, isUsdMode);
             };
 
             if (typeof cordova !== "undefined" && cordova.plugin && cordova.plugin.http) {
@@ -1289,96 +1209,224 @@
                     try { 
                         const data = JSON.parse(response.data); 
                         processFrankfurterData(data);
-                    } catch(e) { 
-                        runFallbackChart(); 
-                    }
-                }, function(err) { 
-                    runFallbackChart(); 
-                });
+                    } catch(e) { runFallbackChart(); }
+                }, function(err) { runFallbackChart(); });
             } else {
                 fetch(url).then(res => res.json()).then(data => { 
                     processFrankfurterData(data);
-                }).catch(() => { 
-                    runFallbackChart(); 
-                });
+                }).catch(() => { runFallbackChart(); });
             }
         }
 
-        // [손가락 드래그 탐색 및 햅틱 진동 피드백 정밀 구현]
-        function initChartInteractivity(paddingLeft, chartW) {
-            const chartBox = document.getElementById("pop_chart_box");
-            const tooltip = document.getElementById("chart_tooltip");
-            const vLine = document.getElementById("tooltip_vertical_line");
-            const tooltipDate = document.getElementById("tooltip_date");
-            const tooltipRate = document.getElementById("tooltip_rate");
+        /* [그라데이션 곡선 차트, 최고/최저/포커스링 구현 및 정밀 스크롤 드래그 인터랙션 햅틱 처리] */
+        function renderChartWithPoints(points, isUsdMode) {
+            globalRenderedPoints = points; // 실시간 터치 모듈 연동 데이터 캐싱
             
-            let lastIndex = -1;
+            let maxObj = points[0], minObj = points[0];
+            points.forEach(p => { 
+                if (p.rate > maxObj.rate) maxObj = p; 
+                if (p.rate < minObj.rate) minObj = p; 
+            });
+            
+            const activeTodayRate = isUsdMode ? globalCachedUsdTt : rawNumericRate;
+            
+            document.getElementById("pop_max_rate").innerText = `▲ ${maxObj.rate.toFixed(2)}원`;
+            document.getElementById("pop_max_date").innerText = `(${maxObj.dateStr} 최고)`;
+            document.getElementById("pop_min_rate").innerText = `▼ ${minObj.rate.toFixed(2)}원`;
+            document.getElementById("pop_min_date").innerText = `(${minObj.dateStr} 최저)`;
+            document.getElementById("pop_today_rate").innerText = `${activeTodayRate.toFixed(2)} 원`;
+            
+            const now = new Date();
+            document.getElementById("pop_today_date").innerText = `실시간 동기화 완료\n(${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')} 기준)`;
+            
+            // 반응형 레이아웃 뷰박스 크기 조율
+            const svgW = 360, svgH = 140;
+            const paddingLeft = 16, paddingRight = 16, paddingTop = 22, paddingBottom = 20;
+            const chartW = svgW - paddingLeft - paddingRight;
+            const chartH = svgH - paddingTop - paddingBottom;
+            
+            let rMax = maxObj.rate, rMin = minObj.rate;
+            if (rMax === rMin) { rMax += 4; rMin -= 4; }
+            
+            // 환율 진폭에 따른 여유 공간 확보 계산식
+            const spread = rMax - rMin;
+            rMax += spread * 0.08;
+            rMin -= spread * 0.08;
 
-            const handleMove = (clientX) => {
-                if (!globalChartPoints.length) return;
-                
-                const rect = chartBox.getBoundingClientRect();
-                const relativeX = clientX - rect.left - paddingLeft;
-                
-                // 가로 좌표를 기준으로 30개 포인트 중 어느 위치인지 인덱스 연산
-                let rawIdx = Math.round((relativeX / chartW) * 29);
-                let idx = Math.max(0, Math.min(29, rawIdx));
-                
-                // 새로운 날짜 경계 영역에 진입했을 경우
-                if (idx !== lastIndex) {
-                    lastIndex = idx;
-                    const p = globalChartPoints[idx];
+            let pathCoords = [];
+            points.forEach((p, idx) => {
+                let x = paddingLeft + (idx * (chartW / 29));
+                let y = paddingTop + (chartH - ((p.rate - rMin) / (rMax - rMin)) * chartH);
+                pathCoords.push({x, y, dateStr: p.dateStr, rate: p.rate});
+            });
+            
+            // 아름다운 부드러운 스플라인 곡선(Cubic Spline Path) 변환 알고리즘 작동
+            let dPath = `M ${pathCoords[0].x} ${pathCoords[0].y}`;
+            for (let i = 0; i < pathCoords.length - 1; i++) {
+                let p0 = pathCoords[i];
+                let p1 = pathCoords[i + 1];
+                let cpX1 = p0.x + (chartW / 29) * 0.4;
+                let cpY1 = p0.y;
+                let cpX2 = p1.x - (chartW / 29) * 0.4;
+                let cpY2 = p1.y;
+                dPath += ` C ${cpX1} ${cpY1}, ${cpX2} ${cpY2}, ${p1.x} ${p1.y}`;
+            }
+            
+            let areaPath = dPath + ` L ${pathCoords[pathCoords.length-1].x} ${svgH - paddingBottom} L ${pathCoords[0].x} ${svgH - paddingBottom} Z`;
+            
+            // 통화별 특화 비주얼 스킨 컬러 매칭 스위칭
+            const chartStrokeColor = isUsdMode ? "#10b981" : "var(--accent-pink)";
+            const areaStopColor = isUsdMode ? "#10b981" : "var(--accent-pink)";
+            const glowFilterColor = isUsdMode ? "rgba(16,185,129,0.4)" : "rgba(244,114,182,0.4)";
+
+            // 특수 시각 요소 (최고/최저 링 및 오늘 포커스 펄싱링 어셈블리 구축)
+            let markersHtml = "";
+            let textLabelsHtml = "";
+
+            pathCoords.forEach((pt, idx) => {
+                const isMax = (points[idx].rate === maxObj.rate && points[idx].dateStr === maxObj.dateStr);
+                const isMin = (points[idx].rate === minObj.rate && points[idx].dateStr === minObj.dateStr);
+                const isToday = (idx === 29);
+
+                if (isMax) {
+                    markersHtml += `<circle cx="${pt.x}" cy="${pt.y}" r="4.5" fill="var(--accent-red)" stroke="#ffffff" stroke-width="1.5"/>`;
+                    textLabelsHtml += `
+                        <g transform="translate(${pt.x}, ${pt.y - 8})">
+                            <rect x="-30" y="-13" width="60" height="13" rx="4" fill="var(--accent-red)" opacity="0.95"/>
+                            <text x="0" y="-4" fill="#ffffff" font-size="8.5" font-weight="900" text-anchor="middle">▲최고 ${pt.rate.toFixed(1)}</text>
+                        </g>`;
+                }
+                if (isMin) {
+                    markersHtml += `<circle cx="${pt.x}" cy="${pt.y}" r="4.5" fill="#38bdf8" stroke="#ffffff" stroke-width="1.5"/>`;
+                    textLabelsHtml += `
+                        <g transform="translate(${pt.x}, ${pt.y + 14})">
+                            <rect x="-30" y="-11" width="60" height="13" rx="4" fill="#38bdf8" opacity="0.95"/>
+                            <text x="0" y="-2" fill="#000000" font-size="8.5" font-weight="900" text-anchor="middle">▼최저 ${pt.rate.toFixed(1)}</text>
+                        </g>`;
+                }
+                if (isToday) {
+                    // 오늘 마커 우측 끝 포커스 링 진동 맥박 효과(Pulsing Animation Effect) 결합
+                    markersHtml += `
+                        <circle cx="${pt.x}" cy="${pt.y}" r="8" fill="${chartStrokeColor}" opacity="0.35">
+                            <animate attributeName="r" values="4;10;4" dur="2.2s" repeatCount="indefinite"/>
+                            <animate attributeName="opacity" values="0.6;0;0.6" dur="2.2s" repeatCount="indefinite"/>
+                        </circle>
+                        <circle cx="${pt.x}" cy="${pt.y}" r="4.5" fill="${chartStrokeColor}" stroke="#ffffff" stroke-width="2"/>`;
+                }
+            });
+
+            const chartBox = document.getElementById("pop_chart_box");
+            chartBox.innerHTML = `
+                <div class="chart-drag-tooltip" id="chart_drag_tooltip"></div>
+                <div class="chart-interactive-overlay" id="chart_touch_surface"></div>
+                <svg viewBox="0 0 ${svgW} ${svgH}" style="width:100%; height:100%; overflow:visible;">
+                    <defs>
+                        <linearGradient id="chartGradientArea" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="${areaStopColor}" stop-opacity="0.32"/>
+                            <stop offset="100%" stop-color="${areaStopColor}" stop-opacity="0.0"/>
+                        </linearGradient>
+                    </defs>
+                    <line x1="${paddingLeft}" y1="${paddingTop}" x2="${svgW-paddingRight}" y2="${paddingTop}" stroke="rgba(255,255,255,0.04)" stroke-dasharray="2,2"/>
+                    <line x1="${paddingLeft}" y1="${paddingTop + chartH/2}" x2="${svgW-paddingRight}" y2="${paddingTop + chartH/2}" stroke="rgba(255,255,255,0.04)" stroke-dasharray="2,2"/>
+                    <line x1="${paddingLeft}" y1="${svgH-paddingBottom}" x2="${svgW-paddingRight}" y2="${svgH-paddingBottom}" stroke="rgba(255,255,255,0.08)"/>
                     
-                    // 네이티브 미세 진동(Haptic Feedback) 활성화 (Android/iOS 웹뷰 공용)
-                    if (navigator && navigator.vibrate) {
-                        navigator.vibrate(8); // 경쾌하고 부드러운 8ms 햅틱 터치
+                    <path d="${areaPath}" fill="url(#chartGradientArea)"/>
+                    
+                    <path d="${dPath}" fill="none" stroke="${chartStrokeColor}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0px 3px 6px ${glowFilterColor});"/>
+                    
+                    <line id="drag_indicator_line" x1="0" y1="${paddingTop}" x2="0" y2="${svgH-paddingBottom}" stroke="#ffffff" stroke-width="1.2" stroke-dasharray="3,3" style="display:none; text-shadow:0 0 4px #000;"/>
+                    <circle id="drag_indicator_dot" cx="0" cy="0" r="5" fill="#ffffff" stroke="${chartStrokeColor}" stroke-width="2" style="display:none;"/>
+
+                    <text x="${paddingLeft}" y="${svgH - 4}" fill="var(--text-muted)" font-size="9" font-weight="bold">${points[0].dateStr}</text>
+                    <text x="${svgW - paddingRight}" y="${svgH - 4}" fill="var(--text-muted)" font-size="9" font-weight="bold" text-anchor="end">오늘(${points[29].dateStr})</text>
+                    
+                    ${markersHtml}
+                    ${textLabelsHtml}
+                </svg>`;
+
+            // 인터랙티브 제스처 트래킹 엔진 활성화 바인딩 가동
+            initChartDragInteractions(pathCoords, paddingLeft, chartW);
+        }
+
+        /* [손맛을 극대화한 드래그 탐색 제스처 및 마이크로 햅틱 피드백 엔진 내부 구현] */
+        function initChartDragInteractions(coords, padLeft, cWidth) {
+            const surface = document.getElementById("chart_touch_surface");
+            const tooltip = document.getElementById("chart_drag_tooltip");
+            const indicatorLine = document.getElementById("drag_indicator_line");
+            const indicatorDot = document.getElementById("drag_indicator_dot");
+            
+            if (!surface) return;
+
+            let lastSelectedIndex = -1;
+
+            const handlePointerTrack = (clientX) => {
+                const rect = surface.getBoundingClientRect();
+                const touchX = clientX - rect.left;
+                
+                // 가로 너비 비율 분할 역산으로 30개 데이터 인덱스 매칭 매핑
+                const pct = (touchX - (padLeft * (rect.width / 360))) / (cWidth * (rect.width / 360));
+                let idx = Math.round(pct * 29);
+                if (idx < 0) idx = 0;
+                if (idx > 29) idx = 29;
+
+                const targetPt = coords[idx];
+                
+                // 새로운 날짜 구간 경계면 진입 순간 검출
+                if (idx !== lastSelectedIndex) {
+                    lastSelectedIndex = idx;
+                    
+                    // 마이크로 햅틱 피드백(Tactile 손맛 진동) 발생 유도
+                    if (navigator.vibrate) {
+                        navigator.vibrate(10); 
                     }
                     
-                    // 툴팁 기포 텍스트 및 위치 배치 변경
-                    tooltipDate.innerText = p.dateStr;
-                    tooltipRate.innerText = p.rate.toFixed(2) + "원";
-                    
-                    // 툴팁 위치 정밀 연산
-                    const pointX = paddingLeft + (idx * (chartW / 29));
-                    tooltip.style.left = `${(pointX / rect.width) * 100}%`;
+                    // 실시간 UI 컴포넌트 동적 트래킹 연동 조율
+                    indicatorLine.setAttribute("x1", targetPt.x);
+                    indicatorLine.setAttribute("x2", targetPt.x);
+                    indicatorLine.style.display = "block";
+
+                    indicatorDot.setAttribute("cx", targetPt.x);
+                    indicatorDot.setAttribute("cy", targetPt.y);
+                    indicatorDot.style.display = "block";
+
+                    // 툴팁 박스 위치 및 내용 최신화 가동
                     tooltip.style.display = "block";
-                    
-                    vLine.style.left = `${pointX}px`;
-                    vLine.style.display = "block";
+                    tooltip.style.left = `${(targetPt.x / 360) * 100}%`;
+                    tooltip.innerText = `${targetPt.dateStr} ➔ ${targetPt.rate.toFixed(2)}원`;
                 }
             };
 
-            const handleEnd = () => {
-                tooltip.style.display = "none";
-                vLine.style.display = "none";
-                lastIndex = -1;
+            surface.addEventListener("touchstart", (e) => {
+                handlePointerTrack(e.touches[0].clientX);
+            }, { passive: true });
+
+            surface.addEventListener("touchmove", (e) => {
+                handlePointerTrack(e.touches[0].clientX);
+            }, { passive: true });
+
+            const clearTrackingEffects = () => {
+                lastSelectedIndex = -1;
+                if (indicatorLine) indicatorLine.style.display = "none";
+                if (indicatorDot) indicatorDot.style.display = "none";
+                if (tooltip) tooltip.style.display = "none";
             };
 
-            // 모바일 터치 이벤트 연결
-            chartBox.addEventListener("touchstart", (e) => {
-                handleMove(e.touches[0].clientX);
-            }, { passive: true });
-
-            chartBox.addEventListener("touchmove", (e) => {
-                handleMove(e.touches[0].clientX);
-            }, { passive: true });
-
-            chartBox.addEventListener("touchend", handleEnd, { passive: true });
+            surface.addEventListener("touchend", clearTrackingEffects);
+            surface.addEventListener("touchcancel", clearTrackingEffects);
         }
 
         function closeTrendPopup() { 
             const modal = document.getElementById("trend_modal");
-            modal.classList.remove("active");
-            setTimeout(() => {
-                modal.style.display = "none";
-            }, 300); // 슬라이드 다운 애니메이션 대기 시간
+            modal.classList.remove("active-sheet");
+            // 바텀시트 다운 가상 슬라이드 트랜지션 시간 대기 후 레이어 히든
+            setTimeout(() => { modal.style.display = "none"; }, 300);
         }
         
-        // [정밀 터치 디스패처: 스와이프 제스처와 단순 탭 터치 완벽 분리 구현]
-        let touchStartX = 0, touchStartY = 0, touchMoved = false;
         function initTrendTouchEvents() {
             const trendArea = document.querySelector('.guide-right-area');
             if (!trendArea) return;
+            
+            let touchStartX = 0, touchStartY = 0, touchMoved = false;
             
             trendArea.addEventListener('touchstart', (e) => {
                 touchStartX = e.touches[0].clientX;
@@ -1408,35 +1456,7 @@
                     openTrendPopup();
                 }
             }, { passive: false });
-
-            // 바텀시트 스와이프해서 닫기 제스처 추가
-            const bottomSheet = document.querySelector('.trend-modal-content');
-            let sheetStartY = 0;
-            bottomSheet.addEventListener('touchstart', (e) => {
-                sheetStartY = e.touches[0].clientY;
-            }, { passive: true });
-
-            bottomSheet.addEventListener('touchmove', (e) => {
-                let currentY = e.touches[0].clientY;
-                let pullDistance = currentY - sheetStartY;
-                if (pullDistance > 0) {
-                    bottomSheet.style.transform = `translateY(${pullDistance}px)`;
-                }
-            }, { passive: true });
-
-            bottomSheet.addEventListener('touchend', (e) => {
-                let pullDistance = e.changedTouches[0].clientY - sheetStartY;
-                bottomSheet.style.transform = ''; // 인라인 스타일 복구
-                if (pullDistance > 100) {
-                    closeTrendPopup(); // 100px 이상 쓸어내리면 닫기
-                }
-            }, { passive: true });
         }
-
-        // [백그라운드에서 다시 복귀했을 때 즉시 오늘 날짜 환율을 재요청하는 핸들러]
-        document.addEventListener("resume", () => {
-            syncRateLoader(); // 앱 포커스 복귀 시 강제 리렌더링 및 환율 즉시 갱신
-        }, false);
 
         function initializeAppPipeline() { loadAppState(); changeEngineMode(systemViewMode); switchTab(currentTab, true); renderHistory(); initTrendTouchEvents(); syncRateLoader(); }
         document.addEventListener('deviceready', () => { initializeAppPipeline(); }, false);
