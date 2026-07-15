@@ -24,13 +24,7 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: -apple-system, BlinkMacSystemFont, "Malgun Gothic", sans-serif; margin: 0; padding: 0; }
         body { background-color: var(--bg-main); color: var(--text-main); padding: 10px 12px 16px 12px; display: flex; flex-direction: column; gap: 10px; height: 100vh; overflow: hidden; }
         
-        .premium-panel { 
-            background: linear-gradient(145deg, var(--bg-panel-top) 0%, var(--bg-panel-bottom) 100%); 
-            border-radius: 14px; 
-            border: var(--card-border); 
-            box-shadow: var(--panel-shadow), inset 0 1px 2px rgba(255, 255, 255, 0.06); 
-            flex-shrink: 0; 
-        }
+        .premium-panel { background: linear-gradient(145deg, var(--bg-panel-top) 0%, var(--bg-panel-bottom) 100%); border-radius: 14px; border: var(--card-border); box-shadow: var(--panel-shadow), inset 0 1px 2px rgba(255, 255, 255, 0.06); flex-shrink: 0; }
         
         .header-bar { display: flex; justify-content: space-between; align-items: center; padding: 8px 14px; }
         .header-title { font-size: 21px; font-weight: 900; letter-spacing: -0.8px; background: linear-gradient(135deg, #ff65a3 0%, #a855f7 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
@@ -69,22 +63,7 @@
         .btn-refresh { background: linear-gradient(135deg, #374151, #1f2937); border: 1px solid rgba(255,255,255,0.06); }
         .btn-calc { background: linear-gradient(135deg, var(--accent-blue-start), var(--accent-blue-end)); border: 1px solid rgba(255,255,255,0.06); }
         
-        .result-container { 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center; 
-            align-items: center; 
-            text-align: center; 
-            gap: 4px; 
-            padding: 12px 8px; 
-            background: linear-gradient(145deg, #161936 0%, #070812 100%);
-            border: 2px solid rgba(255, 77, 77, 0.35); 
-            border-radius: 14px;
-            width: 100%; 
-            overflow: hidden; 
-            box-shadow: var(--panel-shadow), inset 0 0 15px rgba(255, 77, 77, 0.08); 
-            flex-shrink: 0;
-        }
+        .result-container { display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 4px; padding: 12px 8px; background: linear-gradient(145deg, #161936 0%, #070812 100%); border: 2px solid rgba(255, 77, 77, 0.35); border-radius: 14px; width: 100%; overflow: hidden; box-shadow: var(--panel-shadow), inset 0 0 15px rgba(255, 77, 77, 0.08); flex-shrink: 0; }
         #final_res { font-size: 26px; font-weight: bold; color: var(--accent-red); text-shadow: 0 0 16px rgba(255, 77, 77, 0.4); white-space: nowrap; letter-spacing: -0.5px; }
         #buffer_res { font-size: 18px; font-weight: bold; color: #ff6b6b; white-space: nowrap; letter-spacing: -0.3px; }
         
@@ -95,61 +74,19 @@
         .guide-item span.arrow { text-align: center; color: var(--text-muted); font-size: 10px; }
         .guide-item span.foreign { text-align: left; color: #e2e8f0; padding-left: 2px; }
         
-        .guide-right-area { 
-            flex: 0.9; 
-            border-left: 1px solid rgba(255,255,255,0.08); 
-            padding-left: 12px; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center; 
-            min-width: 0; 
-            position: relative; 
-            overflow: hidden;
-            user-select: none;
-        }
+        .guide-right-area { flex: 0.9; border-left: 1px solid rgba(255,255,255,0.08); padding-left: 12px; display: flex; flex-direction: column; justify-content: center; min-width: 0; position: relative; overflow: hidden; user-select: none; }
         .trend-title { font-size: 10.5px; color: var(--text-muted); margin-bottom: 4px; font-weight: bold; }
         
-        .trend-slider-viewport { 
-            overflow: hidden; 
-            width: 100%; 
-            position: relative;
-        }
-        .trend-slider-track { 
-            display: flex; 
-            width: 200%; 
-            transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1); 
-            will-change: transform;
-        }
-        .trend-slide { 
-            width: 50%; 
-            flex-shrink: 0; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 3.5px; 
-        }
+        .trend-slider-viewport { overflow: hidden; width: 100%; position: relative; }
+        .trend-slider-track { display: flex; width: 200%; transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1); will-change: transform; }
+        .trend-slide { width: 50%; flex-shrink: 0; display: flex; flex-direction: column; gap: 3.5px; }
         
         .trend-row { display: flex; justify-content: flex-start; font-size: 13.5px; font-weight: 700; color: #38bdf8; white-space: nowrap; gap: 8px; line-height: 1.4; }
         .trend-rate { color: var(--accent-green); min-width: 50px; }
         
-        .trend-dots { 
-            display: flex; 
-            justify-content: center; 
-            gap: 5px; 
-            margin-top: 6px; 
-            flex-shrink: 0; 
-        }
-        .trend-dot { 
-            width: 4.5px; 
-            height: 4.5px; 
-            border-radius: 50%; 
-            background: rgba(255, 255, 255, 0.2); 
-            transition: all 0.25s ease; 
-        }
-        .trend-dot.active { 
-            background: #38bdf8; 
-            width: 11px; 
-            border-radius: 2.5px; 
-        }
+        .trend-dots { display: flex; justify-content: center; gap: 5px; margin-top: 6px; flex-shrink: 0; }
+        .trend-dot { width: 4.5px; height: 4.5px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); transition: all 0.25s ease; }
+        .trend-dot.active { background: #38bdf8; width: 11px; border-radius: 2.5px; }
         
         .history-panel { display: flex; flex-direction: column; gap: 5px; flex: 1; min-height: 0; background: transparent; }
         .history-header { display: flex; justify-content: space-between; align-items: center; padding: 0 2px; flex-shrink: 0; }
@@ -162,51 +99,11 @@
         .log-box::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 3px; }
         .log-box.has-data { color: #38bdf8; }
         
-        .mode-controller { 
-            position: fixed; 
-            bottom: 20px; 
-            right: 12px; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 12px; 
-            z-index: 10005; 
-        }
-        .mode-arrow-btn { 
-            width: 48px; 
-            height: 48px; 
-            border-radius: 50%; 
-            background: rgba(255, 255, 255, 0.04); 
-            backdrop-filter: blur(10px); 
-            -webkit-backdrop-filter: blur(10px); 
-            border: 1px solid rgba(255, 255, 255, 0.08); 
-            color: rgba(255, 255, 255, 0.35); 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            cursor: pointer; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3); 
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            opacity: 0.6;
-        }
-        .mode-arrow-btn .arrow-icon { 
-            font-size: 11px; 
-            line-height: 1; 
-            margin-bottom: 1px;
-        }
-        .mode-arrow-btn .btn-text { 
-            font-size: 8.5px; 
-            font-weight: 800; 
-            letter-spacing: -0.5px;
-            line-height: 1;
-        }
-        .mode-arrow-btn.active { 
-            background: linear-gradient(135deg, rgba(37, 99, 235, 0.35), rgba(29, 78, 216, 0.45)); 
-            color: #ffffff; 
-            border-color: rgba(59, 130, 246, 0.5); 
-            box-shadow: 0 6px 16px rgba(29, 78, 216, 0.35), inset 0 1px 1px rgba(255,255,255,0.15); 
-            opacity: 0.95;
-        }
+        .mode-controller { position: fixed; bottom: 20px; right: 12px; display: flex; flex-direction: column; gap: 12px; z-index: 10005; }
+        .mode-arrow-btn { width: 48px; height: 48px; border-radius: 50%; background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.08); color: rgba(255, 255, 255, 0.35); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3); transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); opacity: 0.6; }
+        .mode-arrow-btn .arrow-icon { font-size: 11px; line-height: 1; margin-bottom: 1px; }
+        .mode-arrow-btn .btn-text { font-size: 8.5px; font-weight: 800; letter-spacing: -0.5px; line-height: 1; }
+        .mode-arrow-btn.active { background: linear-gradient(135deg, rgba(37, 99, 235, 0.35), rgba(29, 78, 216, 0.45)); color: #ffffff; border-color: rgba(59, 130, 246, 0.5); box-shadow: 0 6px 16px rgba(29, 78, 216, 0.35), inset 0 1px 1px rgba(255,255,255,0.15); opacity: 0.95; }
         
         body.large-font-mode { padding: 6px; gap: 4px; }
         body.large-font-mode .tab-btn { font-size: 18px; padding: 10px; }
@@ -237,233 +134,81 @@
         body.large-font-mode .trend-dot { width: 6px; height: 6px; }
         body.large-font-mode .trend-dot.active { width: 14px; }
 
-        /* [고급 바텀 시트 및 글래스모피즘 오버레이 반영 스타일 수정] */
+        /* [수정 반영] 환율 차트 팝업 - 화면 중간(중앙) 정렬 및 슬라이드업 효과 구현 */
         .trend-modal-overlay {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(6, 7, 16, 0.55); 
+            background: rgba(6, 7, 16, 0.65); 
             backdrop-filter: blur(10px); 
             -webkit-backdrop-filter: blur(10px);
             z-index: 99999;
-            align-items: flex-end; 
+            align-items: center; /* 변경: 바텀이 아닌 화면 정중앙 배치 */
             justify-content: center;
         }
         .trend-modal-content {
-            width: 100%;
+            width: 92%; /* 변경: 중앙에 깔끔하게 뜨도록 양옆 마진 확보 */
             max-width: 460px;
-            background: linear-gradient(180deg, rgba(23, 26, 48, 0.95) 0%, rgba(10, 11, 22, 0.98) 100%);
-            border-radius: 22px 22px 0 0;
-            border-top: 1px solid rgba(255, 255, 255, 0.15);
-            border-left: 1px solid rgba(255, 255, 255, 0.08);
-            border-right: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.7);
-            padding: 12px 20px 30px 20px;
+            background: linear-gradient(180deg, rgba(23, 26, 48, 0.96) 0%, rgba(10, 11, 22, 0.99) 100%);
+            border-radius: 20px; /* 변경: 전체 라운딩 스킨 적용 */
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.75);
+            padding: 16px 20px 24px 20px;
             display: flex;
             flex-direction: column;
             gap: 14px;
             user-select: none;
-            transform: translateY(100%);
-            transition: transform 0.32s cubic-bezier(0.1, 0.76, 0.55, 0.94);
+            transform: translateY(100vh); /* 변경: 화면 아예 바깥 아래쪽에서 대기 */
+            transition: transform 0.38s cubic-bezier(0.1, 0.76, 0.55, 0.94);
             will-change: transform;
         }
         .trend-modal-overlay.active-sheet .trend-modal-content {
-            transform: translateY(0);
+            transform: translateY(0); /* 호출 시 화면 중앙 위치로 스무스하게 슬라이드업 유지 */
         }
         
-        /* 바텀 시트 상단 손잡이 라인 */
-        .bottom-sheet-handle {
-            width: 42px;
-            height: 4.5px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 3px;
-            margin: 0 auto 4px auto;
-            flex-shrink: 0;
-        }
-
-        .trend-modal-title {
-            font-size: 15px; 
-            font-weight: 900;
-            text-align: center;
-            letter-spacing: -0.4px;
-            background: linear-gradient(135deg, #38bdf8 0%, #a855f7 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            line-height: 1.3;
-        }
+        .bottom-sheet-handle { width: 42px; height: 4.5px; background: rgba(255, 255, 255, 0.2); border-radius: 3px; margin: 0 auto 4px auto; flex-shrink: 0; }
+        .trend-modal-title { font-size: 15px; font-weight: 900; text-align: center; letter-spacing: -0.4px; background: linear-gradient(135deg, #38bdf8 0%, #a855f7 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.3; }
         
-        .trend-summary-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 12px;
-            padding: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+        .trend-summary-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 12px; padding: 10px; display: flex; justify-content: space-between; align-items: center; }
         .trend-summary-main { display: flex; flex-direction: column; gap: 2px; }
         .trend-summary-label { font-size: 11px; color: var(--text-muted); font-weight: bold; }
         .trend-summary-value { font-size: 21px; font-weight: 900; color: var(--accent-green); letter-spacing: -0.5px; }
 
-        .trend-stats-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-            text-align: center;
-        }
-        .trend-stat-card {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            border-radius: 10px;
-            padding: 8px 4px;
-        }
-        .trend-stat-label {
-            font-size: 10px;
-            color: var(--text-muted);
-            margin-bottom: 2px;
-            font-weight: bold;
-        }
-        .trend-stat-value {
-            font-size: 13.5px;
-            font-weight: 900;
-            letter-spacing: -0.3px;
-        }
+        .trend-stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; text-align: center; }
+        .trend-stat-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.04); border-radius: 10px; padding: 8px 4px; }
+        .trend-stat-label { font-size: 10px; color: var(--text-muted); margin-bottom: 2px; font-weight: bold; }
+        .trend-stat-value { font-size: 13.5px; font-weight: 900; letter-spacing: -0.3px; }
         .trend-stat-card.max .trend-stat-value { color: var(--accent-red); }
         .trend-stat-card.min .trend-stat-value { color: #38bdf8; }
-        .trend-stat-date {
-            font-size: 9.5px;
-            color: var(--text-muted);
-            margin-top: 1px;
-            font-weight: bold;
-        }
+        .trend-stat-date { font-size: 9.5px; color: var(--text-muted); margin-top: 1px; font-weight: bold; }
         
-        /* 고도화된 인터랙티브 차트 컨테이너 */
-        .trend-chart-container {
-            width: 100%;
-            height: 160px;
-            background: rgba(0, 0, 0, 0.5);
-            border-radius: 12px;
-            padding: 8px 6px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            position: relative;
-            touch-action: none; 
-        }
+        .trend-chart-container { width: 100%; height: 160px; background: rgba(0, 0, 0, 0.5); border-radius: 12px; padding: 8px 6px; border: 1px solid rgba(255, 255, 255, 0.05); position: relative; touch-action: none; }
+        .chart-interactive-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; }
+        .chart-drag-tooltip { position: absolute; top: 6px; left: 50%; transform: translateX(-50%); background: rgba(255, 255, 255, 0.96); color: #0c0d19; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 900; box-shadow: 0 4px 15px rgba(0,0,0,0.5); pointer-events: none; display: none; z-index: 20; white-space: nowrap; letter-spacing: -0.2px; border: 1px solid #ffffff; }
         
-        /* 실시간 손가락 드래그 검출 안내 영역 및 툴팁 박스 */
-        .chart-interactive-overlay {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 10;
-        }
-        .chart-drag-tooltip {
-            position: absolute;
-            top: 6px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.96);
-            color: #0c0d19;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 900;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            pointer-events: none;
-            display: none;
-            z-index: 20;
-            white-space: nowrap;
-            letter-spacing: -0.2px;
-            border: 1px solid #ffffff;
-        }
-        
-        .trend-close-hint {
-            text-align: center;
-            font-size: 11px;
-            color: var(--text-muted);
-            font-weight: bold;
-            animation: pulseHint 2s infinite;
-        }
-        @keyframes pulseHint {
-            0% { opacity: 0.4; }
-            50% { opacity: 0.9; }
-            100% { opacity: 0.4; }
-        }
+        .trend-close-hint { text-align: center; font-size: 11px; color: var(--text-muted); font-weight: bold; animation: pulseHint 2s infinite; }
+        @keyframes pulseHint { 0% { opacity: 0.4; } 50% { opacity: 0.9; } 100% { opacity: 0.4; } }
 
-        /* 큰글씨 바텀 시트 스타일 대응 */
-        body.large-font-mode .trend-modal-content { padding-bottom: 35px; gap: 16px; }
+        body.large-font-mode .trend-modal-content { padding-bottom: 24px; gap: 16px; }
         body.large-font-mode .trend-modal-title { font-size: 18px; }
         body.large-font-mode .trend-summary-value { font-size: 25px; }
         body.large-font-mode .trend-stat-value { font-size: 16px; }
         body.large-font-mode .trend-chart-container { height: 180px; }
 
-        .guide-modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(7, 8, 18, 0.45);
-            backdrop-filter: blur(3.5px);
-            -webkit-backdrop-filter: blur(3.5px);
-            z-index: 99999;
-            align-items: center;
-            justify-content: center;
-            padding: 12px;
-        }
-        .guide-modal-content {
-            width: 94%;
-            max-width: 350px;
-            background: linear-gradient(145deg, var(--bg-panel-top) 0%, var(--bg-panel-bottom) 100%);
-            border-radius: 16px;
-            border: 2px solid rgba(244, 114, 182, 0.35);
-            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85);
-            padding: 12px 14px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            user-select: none;
-            max-height: 94vh;
-        }
-        .guide-modal-title {
-            font-size: 15px;
-            font-weight: 900;
-            text-align: center;
-            letter-spacing: -0.4px;
-            background: linear-gradient(135deg, #f472b6 0%, #a855f7 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            padding-bottom: 2px;
-        }
-        .guide-modal-list {
-            display: flex;
-            flex-direction: column;
-            gap: 3.5px;
-            overflow: hidden;
-        }
+        .guide-modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(7, 8, 18, 0.55); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); z-index: 99999; align-items: center; justify-content: center; padding: 12px; }
+        .guide-modal-content { width: 94%; max-width: 350px; background: linear-gradient(145deg, var(--bg-panel-top) 0%, var(--bg-panel-bottom) 100%); border-radius: 16px; border: 2px solid rgba(244, 114, 182, 0.35); box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85); padding: 14px; display: flex; flex-direction: column; gap: 10px; user-select: none; max-height: 94vh; }
+        .guide-modal-title { font-size: 15px; font-weight: 900; text-align: center; letter-spacing: -0.4px; background: linear-gradient(135deg, #f472b6 0%, #a855f7 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; padding-bottom: 2px; }
+        .guide-modal-list { display: flex; flex-direction: column; gap: 3.5px; overflow-y: auto; max-height: 60vh; }
         
-        .pop-guide-item {
-            display: grid;
-            grid-template-columns: 78px 18px 1fr;
-            align-items: center;
-            font-size: 14.5px;
-            padding: 4px 10px;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            border-radius: 7px;
-        }
+        .pop-guide-item { display: grid; grid-template-columns: 78px 18px 1fr; align-items: center; font-size: 14.5px; padding: 6px 10px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.04); border-radius: 7px; }
         .pop-guide-item span.arrow { text-align: center; color: var(--text-muted); font-size: 10px; }
-        
-        .pop-guide-item span.foreign { 
-            color: var(--accent-green); 
-            text-align: left; 
-            font-size: 15px; 
-            padding-left: 10px; 
-        }
-        .guide-modal-content .trend-close-hint { font-size: 10px; margin-top: 2px; }
+        .pop-guide-item span.foreign { color: var(--accent-green); text-align: left; font-size: 15px; padding-left: 10px; }
+        .guide-modal-content .trend-close-hint { font-size: 11px; margin-top: 4px; }
 
-        body.large-font-mode .guide-modal-content { gap: 6px; padding: 10px 12px; }
+        body.large-font-mode .guide-modal-content { gap: 8px; padding: 12px; }
         body.large-font-mode .guide-modal-title { font-size: 17px; }
-        body.large-font-mode .guide-modal-list { gap: 3px; }
-        body.large-font-mode .pop-guide-item { padding: 4.5px 10px; grid-template-columns: 95px 22px 1fr; }
+        body.large-font-mode .guide-modal-list { gap: 4px; }
+        body.large-font-mode .pop-guide-item { padding: 8px 10px; grid-template-columns: 95px 22px 1fr; }
         body.large-font-mode .pop-guide-item span { font-size: 16.5px !important; }
         body.large-font-mode .pop-guide-item span.foreign { font-size: 16.5px !important; padding-left: 14px; }
     </style>
@@ -547,15 +292,15 @@
     </div>
 
     <div id="guide_modal" class="guide-modal-overlay" onclick="closeGuidePopup()">
-        <div class="guide-modal-content" onclick="closeGuidePopup(); event.stopPropagation();">
+        <div class="guide-modal-content" onclick="event.stopPropagation();">
             <div class="guide-modal-title" id="pop_guide_title">구간별 최대 효율 외화 금액</div>
             <div class="guide-modal-list" id="pop_guide_list"></div>
-            <div class="trend-close-hint">💡 한 번 더 터치하면 팝업이 닫힙니다.</div>
+            <div class="trend-close-hint">💡 바깥 어두운 영역을 터치하면 팝업이 닫힙니다.</div>
         </div>
     </div>
 
     <div id="trend_modal" class="trend-modal-overlay" onclick="closeTrendPopup()">
-        <div class="trend-modal-content" onclick="closeTrendPopup(); event.stopPropagation();">
+        <div class="trend-modal-content" onclick="event.stopPropagation();">
             <div class="bottom-sheet-handle"></div>
             <div class="trend-modal-title">공개 환율 사이트 정보</div>
             
@@ -580,10 +325,9 @@
                 </div>
             </div>
             
-            <div class="trend-chart-container" id="pop_chart_box">
-                </div>
+            <div class="trend-chart-container" id="pop_chart_box"></div>
             
-            <div class="trend-close-hint">💡 바텀 시트 바깥이나 손잡이를 터치하면 닫힙니다.</div>
+            <div class="trend-close-hint">💡 팝업 바깥 어두운 영역을 터치하면 닫힙니다.</div>
         </div>
     </div>
     
@@ -635,8 +379,6 @@
         let globalCachedUsdTt = 1350.00; 
         let currentVisaRatesMap = {}; 
         let trendActivePage = 0;
-        
-        // 인터랙티브 정밀 트래킹을 위한 글로벌 데이터 보관소
         let globalRenderedPoints = [];
 
         const rateInput = document.getElementById("rate_input"), amountInput = document.getElementById("amount_input");
@@ -660,7 +402,6 @@
         function extractRateFromActiveCache() { 
             const info = getInfo(); 
             if(!info) return; 
-            
             if (info.code === "USD") { 
                 rawNumericRate = globalCachedUsdTt; 
             } else if (currentVisaRatesMap && currentVisaRatesMap[info.code]) {
@@ -704,7 +445,6 @@
                 dot0.classList.remove("active");
                 dot1.classList.add("active");
             }
-            
             if (isUserSwipe && navigator && navigator.vibrate) {
                 navigator.vibrate(12); 
             }
@@ -717,13 +457,11 @@
             
             usdContainer.innerHTML = ""; 
             selContainer.innerHTML = ""; 
-            
             const info = getInfo();
             if(!info) return;
 
             let dateCursor = new Date(); 
             let addedCount = 0; 
-            
             let historyMap = {};
             try { historyMap = JSON.parse(localStorage.getItem("themore_usd_history_map") || "{}"); } catch(e) {}
 
@@ -732,7 +470,6 @@
                 if(day !== 0 && day !== 6) { 
                     let ymd = getParamDateStr(dateCursor);
                     let dateString = `${String(dateCursor.getMonth() + 1).padStart(2, '0')}/${String(dateCursor.getDate()).padStart(2, '0')}`; 
-                    
                     let calculatedDayUsdRate = historyMap[ymd];
                     if (!calculatedDayUsdRate) {
                         calculatedDayUsdRate = (addedCount === 0) ? globalCachedUsdTt : (globalCachedUsdTt - (addedCount * 1.5));
@@ -759,7 +496,6 @@
                     selRow.className = "trend-row";
                     selRow.innerHTML = `<span class="trend-date">${dateString}</span> <span class="trend-rate" style="color: var(--accent-pink);">${calculatedDaySelRate.toFixed(1)}원</span>`;
                     selContainer.appendChild(selRow);
-                    
                     addedCount++; 
                 } 
                 dateCursor.setDate(dateCursor.getDate() - 1); 
@@ -785,7 +521,6 @@
                     fetchNext(nextCursor, pendingCount);
                     return;
                 }
-
                 let ymd = getParamDateStr(cursor);
                 if (historyMap[ymd] && ymd !== getParamDateStr(new Date())) {
                     let nextCursor = new Date(cursor.getTime());
@@ -832,7 +567,6 @@
         function syncRateLoader() { 
             const statusLbl = document.getElementById("status_lbl");
             const timeLbl = document.getElementById("time_lbl"); 
-            
             statusLbl.style.color = "var(--text-muted)";
             statusLbl.innerText = "네이티브 엔진 가동...";
 
@@ -848,11 +582,9 @@
                 try { historyMap = JSON.parse(localStorage.getItem("themore_usd_history_map") || "{}"); } catch(e) {}
                 historyMap[todayYmd] = rate;
                 localStorage.setItem("themore_usd_history_map", JSON.stringify(historyMap));
-
                 if (statusText.indexOf("TheMore API") !== -1) {
                     syncHistoricalTrendList();
                 }
-
                 extractRateFromActiveCache();
             };
 
@@ -865,7 +597,6 @@
             const now = new Date();
             const day = now.getDay(); 
             const hour = now.getHours();
-            
             const isWeekend = (day === 0 || day === 6);
             const isNight = (hour >= 0 && hour < 9);
 
@@ -883,7 +614,6 @@
                     try {
                         const data = JSON.parse(response.data);
                         const parsedRate = parseFloat(data?.sh?.usdkrw_tt_rate);
-                        
                         if (!isNaN(parsedRate) && parsedRate > 500 && parsedRate < 2500) {
                             if (data.visa && Array.isArray(data.visa)) {
                                 data.visa.forEach(item => {
@@ -896,12 +626,8 @@
                         } else {
                             runOpenErEngine("통신 장애 계산식", 1.0095);
                         }
-                    } catch(e) { 
-                        runOpenErEngine("통신 장애 계산식", 1.0095); 
-                    }
-                }, function(err) { 
-                    runOpenErEngine("통신 장애 계산식", 1.0095); 
-                });
+                    } catch(e) { runOpenErEngine("통신 장애 계산식", 1.0095); }
+                }, function(err) { runOpenErEngine("통신 장애 계산식", 1.0095); });
             }
 
             function runOpenErEngine(formulaLabel, feeMultiplier) {
@@ -919,9 +645,7 @@
                                 }
                             }
                             applyFinalRate(processedAppliedRate, formulaLabel, "기준: 보정환율 연산", "var(--accent-green)");
-                        } else {
-                            runFinalStorageRecovery();
-                        }
+                        } else { runFinalStorageRecovery(); }
                     } catch(e) { runFinalStorageRecovery(); }
                 }, function(err) { runFinalStorageRecovery(); });
             }
@@ -1011,7 +735,6 @@
                 itemDiv.innerHTML = `<span>${tgt.toLocaleString()}원</span> <span class="arrow">➔</span> <span class="foreign">${displayAmtStr}${info.symbol}</span>`;
                 listContainer.appendChild(itemDiv);
             }
-
             modal.style.display = "flex";
         }
 
@@ -1065,18 +788,15 @@
                     return `[${item.time}] ${item.inputAmt}${item.sym} = ${item.finalKrw}원 (~${item.bufKrw}원)`;
                 }
             });
-            
             box.innerText = lines.join("\n"); 
             box.classList.add("has-data"); 
         }
         
         function clearHistory() { historyLog = []; saveAppState(); renderHistory(); }
 
-        /* [고급 인터랙티브 30일 프리미엄 바텀시트 핵심 파이프라인] */
         function openTrendPopup() {
             const modal = document.getElementById("trend_modal");
             modal.style.display = "flex";
-            // 리플로우 유도 후 하단에서 슬라이드업 애니메이션 처리 가동
             setTimeout(() => { modal.classList.add("active-sheet"); }, 15);
             
             const info = getInfo();
@@ -1094,7 +814,6 @@
                 summaryLabel.innerText = `오늘 ${info.code} 교차 정산 환율`;
             }
             
-            // [중요 버그 해결] 날짜 변경 및 캐시 축적 무력화를 위해 실시간 fresh timestamp 삽입 연동
             const today = new Date();
             const endDate = getParamDateStr(today);
             const thirtyDaysAgo = new Date();
@@ -1102,13 +821,11 @@
             const startDate = getParamDateStr(thirtyDaysAgo);
             
             const symbolsParam = isUsdMode ? "KRW" : `KRW,${info.code}`;
-            // 캐시 버스팅 파라미터 (_t) 강제 바인딩 처리로 매번 완전히 신선한 패킷 획득
             const url = `https://api.frankfurter.app/${startDate}..${endDate}?base=USD&symbols=${symbolsParam}&_t=${Date.now()}`;
 
             const runFallbackChart = () => {
                 let points = [];
                 let seed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
-                
                 const lcgRandom = () => {
                     seed = (seed * 1664525 + 1013904223) % 4294967296;
                     return seed / 4294967296;
@@ -1118,7 +835,6 @@
                 let tempRates = new Array(30);
                 tempRates[29] = activeTodayRate;
                 
-                // 왜곡되지 않도록 안정적인 정밀 무작위 걸음(Random Walk) 역산 연산
                 for (let i = 28; i >= 0; i--) {
                     let stepSize = (activeTodayRate / 1350.0) * 5.0;
                     let step = (lcgRandom() - 0.495) * stepSize; 
@@ -1185,9 +901,7 @@
                         if (!found) {
                             let historyMap = {};
                             try { historyMap = JSON.parse(localStorage.getItem("themore_usd_history_map") || "{}"); } catch(e) {}
-                            if (historyMap[ymd]) {
-                                usdRateVal = historyMap[ymd] / 1.0095;
-                            }
+                            if (historyMap[ymd]) { usdRateVal = historyMap[ymd] / 1.0095; }
                         }
                     }
                     
@@ -1218,9 +932,8 @@
             }
         }
 
-        /* [그라데이션 곡선 차트, 최고/최저/포커스링 구현 및 정밀 스크롤 드래그 인터랙션 햅틱 처리] */
         function renderChartWithPoints(points, isUsdMode) {
-            globalRenderedPoints = points; // 실시간 터치 모듈 연동 데이터 캐싱
+            globalRenderedPoints = points; 
             
             let maxObj = points[0], minObj = points[0];
             points.forEach(p => { 
@@ -1239,7 +952,6 @@
             const now = new Date();
             document.getElementById("pop_today_date").innerText = `실시간 동기화 완료\n(${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')} 기준)`;
             
-            // 반응형 레이아웃 뷰박스 크기 조율
             const svgW = 360, svgH = 140;
             const paddingLeft = 16, paddingRight = 16, paddingTop = 22, paddingBottom = 20;
             const chartW = svgW - paddingLeft - paddingRight;
@@ -1248,7 +960,6 @@
             let rMax = maxObj.rate, rMin = minObj.rate;
             if (rMax === rMin) { rMax += 4; rMin -= 4; }
             
-            // 환율 진폭에 따른 여유 공간 확보 계산식
             const spread = rMax - rMin;
             rMax += spread * 0.08;
             rMin -= spread * 0.08;
@@ -1260,7 +971,6 @@
                 pathCoords.push({x, y, dateStr: p.dateStr, rate: p.rate});
             });
             
-            // 아름다운 부드러운 스플라인 곡선(Cubic Spline Path) 변환 알고리즘 작동
             let dPath = `M ${pathCoords[0].x} ${pathCoords[0].y}`;
             for (let i = 0; i < pathCoords.length - 1; i++) {
                 let p0 = pathCoords[i];
@@ -1274,12 +984,10 @@
             
             let areaPath = dPath + ` L ${pathCoords[pathCoords.length-1].x} ${svgH - paddingBottom} L ${pathCoords[0].x} ${svgH - paddingBottom} Z`;
             
-            // 통화별 특화 비주얼 스킨 컬러 매칭 스위칭
             const chartStrokeColor = isUsdMode ? "#10b981" : "var(--accent-pink)";
             const areaStopColor = isUsdMode ? "#10b981" : "var(--accent-pink)";
             const glowFilterColor = isUsdMode ? "rgba(16,185,129,0.4)" : "rgba(244,114,182,0.4)";
 
-            // 특수 시각 요소 (최고/최저 링 및 오늘 포커스 펄싱링 어셈블리 구축)
             let markersHtml = "";
             let textLabelsHtml = "";
 
@@ -1305,7 +1013,6 @@
                         </g>`;
                 }
                 if (isToday) {
-                    // 오늘 마커 우측 끝 포커스 링 진동 맥박 효과(Pulsing Animation Effect) 결합
                     markersHtml += `
                         <circle cx="${pt.x}" cy="${pt.y}" r="8" fill="${chartStrokeColor}" opacity="0.35">
                             <animate attributeName="r" values="4;10;4" dur="2.2s" repeatCount="indefinite"/>
@@ -1331,7 +1038,6 @@
                     <line x1="${paddingLeft}" y1="${svgH-paddingBottom}" x2="${svgW-paddingRight}" y2="${svgH-paddingBottom}" stroke="rgba(255,255,255,0.08)"/>
                     
                     <path d="${areaPath}" fill="url(#chartGradientArea)"/>
-                    
                     <path d="${dPath}" fill="none" stroke="${chartStrokeColor}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0px 3px 6px ${glowFilterColor});"/>
                     
                     <line id="drag_indicator_line" x1="0" y1="${paddingTop}" x2="0" y2="${svgH-paddingBottom}" stroke="#ffffff" stroke-width="1.2" stroke-dasharray="3,3" style="display:none; text-shadow:0 0 4px #000;"/>
@@ -1344,43 +1050,30 @@
                     ${textLabelsHtml}
                 </svg>`;
 
-            // 인터랙티브 제스처 트래킹 엔진 활성화 바인딩 가동
             initChartDragInteractions(pathCoords, paddingLeft, chartW);
         }
 
-        /* [손맛을 극대화한 드래그 탐색 제스처 및 마이크로 햅틱 피드백 엔진 내부 구현] */
         function initChartDragInteractions(coords, padLeft, cWidth) {
             const surface = document.getElementById("chart_touch_surface");
             const tooltip = document.getElementById("chart_drag_tooltip");
             const indicatorLine = document.getElementById("drag_indicator_line");
             const indicatorDot = document.getElementById("drag_indicator_dot");
-            
             if (!surface) return;
 
             let lastSelectedIndex = -1;
-
             const handlePointerTrack = (clientX) => {
                 const rect = surface.getBoundingClientRect();
                 const touchX = clientX - rect.left;
-                
-                // 가로 너비 비율 분할 역산으로 30개 데이터 인덱스 매칭 매핑
                 const pct = (touchX - (padLeft * (rect.width / 360))) / (cWidth * (rect.width / 360));
                 let idx = Math.round(pct * 29);
                 if (idx < 0) idx = 0;
                 if (idx > 29) idx = 29;
 
                 const targetPt = coords[idx];
-                
-                // 새로운 날짜 구간 경계면 진입 순간 검출
                 if (idx !== lastSelectedIndex) {
                     lastSelectedIndex = idx;
+                    if (navigator.vibrate) { navigator.vibrate(10); }
                     
-                    // 마이크로 햅틱 피드백(Tactile 손맛 진동) 발생 유도
-                    if (navigator.vibrate) {
-                        navigator.vibrate(10); 
-                    }
-                    
-                    // 실시간 UI 컴포넌트 동적 트래킹 연동 조율
                     indicatorLine.setAttribute("x1", targetPt.x);
                     indicatorLine.setAttribute("x2", targetPt.x);
                     indicatorLine.style.display = "block";
@@ -1389,20 +1082,14 @@
                     indicatorDot.setAttribute("cy", targetPt.y);
                     indicatorDot.style.display = "block";
 
-                    // 툴팁 박스 위치 및 내용 최신화 가동
                     tooltip.style.display = "block";
                     tooltip.style.left = `${(targetPt.x / 360) * 100}%`;
                     tooltip.innerText = `${targetPt.dateStr} ➔ ${targetPt.rate.toFixed(2)}원`;
                 }
             };
 
-            surface.addEventListener("touchstart", (e) => {
-                handlePointerTrack(e.touches[0].clientX);
-            }, { passive: true });
-
-            surface.addEventListener("touchmove", (e) => {
-                handlePointerTrack(e.touches[0].clientX);
-            }, { passive: true });
+            surface.addEventListener("touchstart", (e) => { handlePointerTrack(e.touches[0].clientX); }, { passive: true });
+            surface.addEventListener("touchmove", (e) => { handlePointerTrack(e.touches[0].clientX); }, { passive: true });
 
             const clearTrackingEffects = () => {
                 lastSelectedIndex = -1;
@@ -1410,7 +1097,6 @@
                 if (indicatorDot) indicatorDot.style.display = "none";
                 if (tooltip) tooltip.style.display = "none";
             };
-
             surface.addEventListener("touchend", clearTrackingEffects);
             surface.addEventListener("touchcancel", clearTrackingEffects);
         }
@@ -1418,7 +1104,6 @@
         function closeTrendPopup() { 
             const modal = document.getElementById("trend_modal");
             modal.classList.remove("active-sheet");
-            // 바텀시트 다운 가상 슬라이드 트랜지션 시간 대기 후 레이어 히든
             setTimeout(() => { modal.style.display = "none"; }, 300);
         }
         
@@ -1427,7 +1112,6 @@
             if (!trendArea) return;
             
             let touchStartX = 0, touchStartY = 0, touchMoved = false;
-            
             trendArea.addEventListener('touchstart', (e) => {
                 touchStartX = e.touches[0].clientX;
                 touchStartY = e.touches[0].clientY;
@@ -1437,9 +1121,7 @@
             trendArea.addEventListener('touchmove', (e) => {
                 let diffX = Math.abs(e.touches[0].clientX - touchStartX);
                 let diffY = Math.abs(e.touches[0].clientY - touchStartY);
-                if (diffX > 10 || diffY > 10) {
-                    touchMoved = true;
-                }
+                if (diffX > 10 || diffY > 10) { touchMoved = true; }
             }, { passive: true });
             
             trendArea.addEventListener('touchend', (e) => {
@@ -1447,14 +1129,8 @@
                 let diffY = e.changedTouches[0].clientY - touchStartY;
                 
                 if (Math.abs(diffX) > 35 && Math.abs(diffX) > Math.abs(diffY)) {
-                    if (diffX < 0) {
-                        setTrendPage(1, true); 
-                    } else {
-                        setTrendPage(0, true); 
-                    }
-                } else if (!touchMoved) {
-                    openTrendPopup();
-                }
+                    if (diffX < 0) { setTrendPage(1, true); } else { setTrendPage(0, true); }
+                } else if (!touchMoved) { openTrendPopup(); }
             }, { passive: false });
         }
 
