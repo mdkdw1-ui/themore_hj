@@ -2,7 +2,6 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <!-- Cordova 환경에 맞춘 보안 정책 설정 (Native HTTP 통신 허용) -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; media-src *; img-src 'self' data: content:; connect-src *;">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>The More for HJ</title>
@@ -112,9 +111,6 @@
         .log-box::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 3px; }
         .log-box.has-data { color: #38bdf8; }
         
-        /* -------------------------------------
-           [개선 사항 2] 우측 고정 화살표 모드 컨트롤러 프리미엄 반투명 스타일 리뉴얼
-        ------------------------------------- */
         .mode-controller { 
             position: fixed; 
             bottom: 20px; 
@@ -140,7 +136,7 @@
             cursor: pointer; 
             box-shadow: 0 4px 12px rgba(0,0,0,0.3); 
             transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            opacity: 0.6; /* 비활성화 시 은은한 투명도 유지 */
+            opacity: 0.6;
         }
         .mode-arrow-btn .arrow-icon { 
             font-size: 11px; 
@@ -153,13 +149,12 @@
             letter-spacing: -0.5px;
             line-height: 1;
         }
-        /* 활성화(선택) 되었을 때 선명하고 이쁜 반투명 컬러 브랜딩 */
         .mode-arrow-btn.active { 
             background: linear-gradient(135deg, rgba(37, 99, 235, 0.35), rgba(29, 78, 216, 0.45)); 
             color: #ffffff; 
             border-color: rgba(59, 130, 246, 0.5); 
             box-shadow: 0 6px 16px rgba(29, 78, 216, 0.35), inset 0 1px 1px rgba(255,255,255,0.15); 
-            opacity: 0.95; /* 눈에 띄게 투명도 최적화 */
+            opacity: 0.95;
         }
         
         body.large-font-mode { padding: 6px; gap: 4px; }
@@ -186,7 +181,6 @@
         body.large-font-mode .guide-item span.arrow { font-size: 15px; color: var(--text-muted); }
         body.large-font-mode .guide-item span.foreign { color: var(--accent-green); font-size: 19px !important; }
 
-        /* 30일 환율 추세 팝업창 스타일 */
         .trend-modal-overlay {
             display: none;
             position: fixed;
@@ -277,9 +271,6 @@
             100% { opacity: 0.4; }
         }
 
-        /* -------------------------------------
-           [개선 사항 1] 원화 구간 최적 외화 모달 여백 조정 (오른쪽으로 밀기)
-        ------------------------------------- */
         .guide-modal-overlay {
             display: none;
             position: fixed;
@@ -336,22 +327,20 @@
         }
         .pop-guide-item span.arrow { text-align: center; color: var(--text-muted); font-size: 10px; }
         
-        /* 외화 금액이 화살표로부터 여유 공간을 가지도록 padding-left 확보 */
         .pop-guide-item span.foreign { 
             color: var(--accent-green); 
             text-align: left; 
             font-size: 15px; 
-            padding-left: 10px; /* 기존 2px에서 10px로 확대하여 왼쪽으로 딱 붙는 현상 해결 */
+            padding-left: 10px; 
         }
         .guide-modal-content .trend-close-hint { font-size: 10px; margin-top: 2px; }
 
-        /* 대형 글자 모드 진입 시 스크롤 없는 최적화 여백 */
         body.large-font-mode .guide-modal-content { gap: 6px; padding: 10px 12px; }
         body.large-font-mode .guide-modal-title { font-size: 17px; }
         body.large-font-mode .guide-modal-list { gap: 3px; }
         body.large-font-mode .pop-guide-item { padding: 4.5px 10px; grid-template-columns: 95px 22px 1fr; }
         body.large-font-mode .pop-guide-item span { font-size: 16.5px !important; }
-        body.large-font-mode .pop-guide-item span.foreign { font-size: 16.5px !important; padding-left: 14px; } /* 대형모드 여백 확보 */
+        body.large-font-mode .pop-guide-item span.foreign { font-size: 16.5px !important; padding-left: 14px; }
     </style>
 </head>
 <body>
@@ -412,7 +401,6 @@
         </div>
     </div>
     
-    <!-- 모드 컨트롤러 내부 구조 리뉴얼 (큰글씨 / 일반글씨 텍스트 배치) -->
     <div class="mode-controller">
         <div id="mode_up" class="mode-arrow-btn" onclick="changeEngineMode('LARGE')">
             <span class="arrow-icon">▲</span>
@@ -424,7 +412,6 @@
         </div>
     </div>
 
-    <!-- 원화 구간별 최적 외화 테이블 12개 팝업 모달 -->
     <div id="guide_modal" class="guide-modal-overlay" onclick="closeGuidePopup()">
         <div class="guide-modal-content" onclick="closeGuidePopup(); event.stopPropagation();">
             <div class="guide-modal-title" id="pop_guide_title">구간별 최대 효율 외화 금액</div>
@@ -433,7 +420,6 @@
         </div>
     </div>
 
-    <!-- 상단 문구 변경 및 가시성 개선 반영 모달 팝업 영역 -->
     <div id="trend_modal" class="trend-modal-overlay" onclick="closeTrendPopup()">
         <div class="trend-modal-content" onclick="closeTrendPopup(); event.stopPropagation();">
             <div class="trend-modal-title">공개 환율 사이트 정보 (themore.app과 차이있음)</div>
@@ -817,7 +803,6 @@
             titleElement.innerText = `${info.name} (${info.code}) 최적 결제선`;
             listContainer.innerHTML = "";
 
-            // 5999부터 16999까지 총 12개 구간 동적 생성
             for (let i = 0; i < 12; i++) {
                 let tgt = 5999 + (i * 1000);
                 let adjustedVal = getAdjustedForeignForTarget(tgt, info);
@@ -893,31 +878,53 @@
             const modal = document.getElementById("trend_modal");
             modal.style.display = "flex";
             
-            const renderData = (baseMidRate) => {
-                const appliedToday = baseMidRate * 1.0095;
+            const today = new Date();
+            const endDate = getParamDateStr(today);
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(today.getDate() - 30);
+            const startDate = getParamDateStr(thirtyDaysAgo);
+            
+            const url = `https://api.frankfurter.app/${startDate}..${endDate}?base=USD&symbols=KRW`;
+
+            // 오프라인 / 통신장애 대응: 오늘 날짜를 시드로 삼아, 매일 완벽하게 독립되고 유기적으로 변동하는 자연스러운 랜덤 워크(Random Walk) 합성 차트 생성
+            const runFallbackChart = () => {
                 let points = [];
-                let today = new Date();
+                let seed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+                
+                const lcgRandom = () => {
+                    seed = (seed * 1664525 + 1013904223) % 4294967296;
+                    return seed / 4294967296;
+                };
+                
+                let tempRates = new Array(30);
+                tempRates[29] = globalCachedUsdTt;
+                for (let i = 28; i >= 0; i--) {
+                    let step = (lcgRandom() - 0.48) * 7.0; 
+                    tempRates[i] = tempRates[i+1] + step;
+                }
                 
                 for (let i = 29; i >= 0; i--) {
                     let d = new Date(today.getTime());
                     d.setDate(today.getDate() - i);
-                    let seed = d.getDate() + (d.getMonth() * 31);
-                    let wave = Math.sin(seed * 0.22) * 11 + Math.cos(seed * 0.6) * 6;
-                    let trend = (29 - i) * 0.25;
-                    let rateVal = appliedToday - ((29 - i) ? (wave + trend) : 0);
                     const mm = String(d.getMonth() + 1).padStart(2, '0');
                     const dd = String(d.getDate()).padStart(2, '0');
-                    points.push({ dateStr: `${mm}/${dd}`, rate: rateVal });
+                    points.push({ dateStr: `${mm}/${dd}`, rate: tempRates[29 - i] });
                 }
-                points[29].rate = appliedToday;
+                renderChartWithPoints(points);
+            };
+
+            const renderChartWithPoints = (points) => {
                 let maxObj = points[0], minObj = points[0];
-                points.forEach(p => { if (p.rate > maxObj.rate) maxObj = p; if (p.rate < minObj.rate) minObj = p; });
+                points.forEach(p => { 
+                    if (p.rate > maxObj.rate) maxObj = p; 
+                    if (p.rate < minObj.rate) minObj = p; 
+                });
                 
                 document.getElementById("pop_max_rate").innerText = maxObj.rate.toFixed(2) + "원";
                 document.getElementById("pop_max_date").innerText = maxObj.dateStr;
                 document.getElementById("pop_min_rate").innerText = minObj.rate.toFixed(2) + "원";
                 document.getElementById("pop_min_date").innerText = minObj.dateStr;
-                document.getElementById("pop_today_rate").innerText = appliedToday.toFixed(2) + "원";
+                document.getElementById("pop_today_rate").innerText = globalCachedUsdTt.toFixed(2) + "원";
                 
                 const svgW = 320, svgH = 110;
                 const paddingLeft = 14, paddingRight = 14, paddingTop = 16, paddingBottom = 16;
@@ -955,12 +962,72 @@
                     </svg>`;
             };
 
+            const processFrankfurterData = (data) => {
+                if (!data || !data.rates) {
+                    runFallbackChart();
+                    return;
+                }
+                
+                let points = [];
+                let lastKnownRate = globalCachedUsdTt / 1.0095;
+                
+                for (let i = 29; i >= 0; i--) {
+                    let d = new Date(today.getTime());
+                    d.setDate(today.getDate() - i);
+                    let ymd = getParamDateStr(d);
+                    const mm = String(d.getMonth() + 1).padStart(2, '0');
+                    const dd = String(d.getDate()).padStart(2, '0');
+                    const dateStr = `${mm}/${dd}`;
+                    
+                    let rateVal = lastKnownRate;
+                    if (data.rates[ymd] && data.rates[ymd]["KRW"]) {
+                        rateVal = data.rates[ymd]["KRW"];
+                        lastKnownRate = rateVal;
+                    } else {
+                        let historyMap = {};
+                        try { historyMap = JSON.parse(localStorage.getItem("themore_usd_history_map") || "{}"); } catch(e) {}
+                        if (historyMap[ymd]) {
+                            rateVal = historyMap[ymd] / 1.0095;
+                        } else {
+                            let found = false;
+                            for (let offset = 1; offset <= 5; offset++) {
+                                let checkD = new Date(d.getTime());
+                                checkD.setDate(d.getDate() - offset);
+                                let checkYmd = getParamDateStr(checkD);
+                                if (data.rates[checkYmd] && data.rates[checkYmd]["KRW"]) {
+                                    rateVal = data.rates[checkYmd]["KRW"];
+                                    found = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    
+                    let finalRate = rateVal * 1.0095;
+                    points.push({ dateStr: dateStr, rate: finalRate });
+                }
+                
+                points[29].rate = globalCachedUsdTt;
+                renderChartWithPoints(points);
+            };
+
             if (typeof cordova !== "undefined" && cordova.plugin && cordova.plugin.http) {
-                cordova.plugin.http.sendRequest("https://open.er-api.com/v6/latest/USD", { method: 'get', timeout: 2500 }, function(response) {
-                    try { const data = JSON.parse(response.data); const rawMidRate = parseFloat(data?.rates?.KRW); if (!isNaN(rawMidRate) && rawMidRate > 0) renderData(rawMidRate); else renderData(globalCachedUsdTt / 1.012); } catch(e) { renderData(globalCachedUsdTt / 1.012); }
-                }, function(err) { renderData(globalCachedUsdTt / 1.012); });
+                cordova.plugin.http.sendRequest(url, { method: 'get', timeout: 4000 }, function(response) {
+                    try { 
+                        const data = JSON.parse(response.data); 
+                        processFrankfurterData(data);
+                    } catch(e) { 
+                        runFallbackChart(); 
+                    }
+                }, function(err) { 
+                    runFallbackChart(); 
+                });
             } else {
-                fetch("https://open.er-api.com/v6/latest/USD").then(res => res.json()).then(data => { const rawMidRate = parseFloat(data?.rates?.KRW); if (!isNaN(rawMidRate) && rawMidRate > 0) renderData(rawMidRate); else renderData(globalCachedUsdTt / 1.012); }).catch(() => { renderData(globalCachedUsdTt / 1.012); });
+                fetch(url).then(res => res.json()).then(data => { 
+                    processFrankfurterData(data);
+                }).catch(() => { 
+                    runFallbackChart(); 
+                });
             }
         }
 
