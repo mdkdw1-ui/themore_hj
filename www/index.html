@@ -211,9 +211,35 @@
         body.large-font-mode .pop-guide-item { padding: 8px 10px; grid-template-columns: 95px 22px 1fr; }
         body.large-font-mode .pop-guide-item span { font-size: 16.5px !important; }
         body.large-font-mode .pop-guide-item span.foreign { font-size: 16.5px !important; padding-left: 14px; }
+
+        /* ========================================================
+           [추가] 반짝이 효과 전용 오버레이 스킨 (독립 배치 레이어)
+           ======================================================== */
+        #sparkle-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            pointer-events: none; /* 최하단 기본 레이어 클릭 방해 절대 불가 속성 */
+            z-index: 999999;     /* 팝업보다 더 위에 얹어 최상단 뷰 확보 */
+            overflow: hidden;
+        }
+        .sparkle-particle {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0;
+            will-change: transform, opacity;
+            animation: twinkleEffect linear forwards;
+        }
+        @keyframes twinkleEffect {
+            0% { transform: scale(0) rotate(0deg); opacity: 0; }
+            50% { opacity: 0.8; }
+            100% { transform: scale(1.4) rotate(180deg); opacity: 0; }
+        }
     </style>
 </head>
 <body>
+    <div id="sparkle-overlay"></div>
+
     <div class="header-bar premium-panel">
         <span class="header-title">The More for HJ</span>
         <img src="icon.png" class="header-logo" alt="Logo">
@@ -1134,7 +1160,75 @@
             }, { passive: false });
         }
 
-        function initializeAppPipeline() { loadAppState(); changeEngineMode(systemViewMode); switchTab(currentTab, true); renderHistory(); initTrendTouchEvents(); syncRateLoader(); }
+        /* ========================================================
+           [추가] 불규칙적 반짝이 생성 파이프라인 엔진 스크립트
+           ======================================================== */
+        function triggerDynamicSparkle() {
+            const container = document.getElementById("sparkle-overlay");
+            if (!container) return;
+
+            // 동시에 화면에 존재하는 파티클 개수가 과도해져 과부하가 걸리는 현상 차단
+            if (container.children.length > 25) return;
+
+            const particle = document.createElement("div");
+            particle.className = "sparkle-particle";
+
+            // 1. 크기 다양화 (2px ~ 6px)
+            const pSize = Math.random() * 4 + 2;
+            particle.style.width = `${pSize}px`;
+            particle.style.height = `${pSize}px`;
+
+            // 2. 화면 전체 영역에 무작위 배치
+            particle.style.left = `${Math.random() * 100}vw`;
+            particle.style.top = `${Math.random() * 100}vh`;
+
+            // 3. 유지 시간 다양화 (1.2초 ~ 2.5초 사이)
+            const duration = Math.random() * 1.3 + 1.2;
+            particle.style.animationDuration = `${duration}s`;
+
+            // 4. 앱의 전용 테마 포인트 톤에 맞춰 다채롭게 은은한 색상 맵핑
+            const themeColors = [
+                "rgba(255, 255, 255, 0.95)", // 크리스탈 화이트
+                "rgba(56, 189, 248, 0.85)",   // 시안 블루
+                "rgba(244, 114, 182, 0.85)",  // 프리미엄 핑크
+                "rgba(168, 85, 247, 0.75)"    // 네온 퍼플
+            ];
+            const targetColor = themeColors[Math.floor(Math.random() * themeColors.length)];
+
+            // 오버레이 효과 극대화를 위한 방사형 그라데이션 및 네온 글로우 스킨 믹싱
+            particle.style.background = `radial-gradient(circle, ${targetColor} 0%, rgba(255,255,255,0) 80%)`;
+            if (Math.random() > 0.4) {
+                particle.style.boxShadow = `0 0 ${pSize * 2.5}px ${targetColor}`;
+            }
+
+            container.appendChild(particle);
+
+            // 애니메이션 종료 직후 DOM에서 완벽히 소멸시켜 메모리 누수 방지
+            setTimeout(() => {
+                particle.remove();
+            }, duration * 1000);
+        }
+
+        function launchSparkleEngine() {
+            const scheduleNext = () => {
+                triggerDynamicSparkle();
+                // 불규칙적인 주기 생성을 위해 다음 생성 대기 시간을 180ms ~ 550ms 사이에서 셔플
+                const dynamicInterval = Math.random() * 370 + 180;
+                setTimeout(scheduleNext, dynamicInterval);
+            };
+            scheduleNext();
+        }
+
+        function initializeAppPipeline() { 
+            loadAppState(); 
+            changeEngineMode(systemViewMode); 
+            switchTab(currentTab, true); 
+            renderHistory(); 
+            initTrendTouchEvents(); 
+            syncRateLoader(); 
+            launchSparkleEngine(); // [추가] 초기화 스케줄 단계에서 반짝이 루프 기동
+        }
+        
         document.addEventListener('deviceready', () => { initializeAppPipeline(); }, false);
         window.addEventListener('DOMContentLoaded', () => { setTimeout(() => { if(typeof cordova === "undefined") initializeAppPipeline(); }, 600); });
    </script>
