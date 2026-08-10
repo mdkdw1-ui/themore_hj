@@ -178,6 +178,7 @@
             border: 1px solid rgba(255, 255, 255, 0.05); 
             box-shadow: inset 0 2px 6px rgba(0,0,0,0.7); 
             overflow: hidden; 
+            position: relative;
         }
         .input-box input { 
             width: 100%; 
@@ -189,8 +190,32 @@
             font-size: 15px !important; 
             color: #ffffff; 
             padding: 2px 0 0 0; 
+            z-index: 2;
+            position: relative;
         }
         .input-box input[readonly] { pointer-events: none; user-select: none; }
+        #rate_input { color: var(--accent-green); }
+        #amount_input { color: #e2e8f0; }
+        
+        /* placeholder 스타일 - 연하게 */
+        .input-box .placeholder-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 15px !important;
+            font-weight: bold;
+            pointer-events: none;
+            z-index: 1;
+            transition: opacity 0.2s ease;
+            white-space: nowrap;
+            letter-spacing: 0.5px;
+        }
+        .input-box .placeholder-text.hidden {
+            opacity: 0;
+        }
+        
         #rate_input { color: var(--accent-green); }
         #amount_input { color: #e2e8f0; }
         
@@ -349,7 +374,9 @@
         body.large-font-mode .select-trigger { font-size: 20px !important; min-height: 42px !important; padding: 6px 10px !important; }
         body.large-font-mode .option-item { font-size: 16px !important; padding: 8px 3px !important; }
         body.large-font-mode .api-info-row { font-size: 13px !important; }
+        body.large-font-mode .input-box { height: 42px !important; }
         body.large-font-mode .input-box input { font-size: 20px !important; }
+        body.large-font-mode .input-box .placeholder-text { font-size: 20px !important; }
         body.large-font-mode .btn-action { font-size: 16px !important; height: 42px !important; }
         body.large-font-mode #final_res { font-size: 24px !important; }
         body.large-font-mode #buffer_res { font-size: 16px !important; }
@@ -496,7 +523,10 @@
             <button class="btn-action btn-refresh" onclick="syncRateLoader(); event.stopPropagation();">갱신</button>
         </div>
         <div class="field-row">
-            <div class="input-box"><input type="number" id="amount_input" placeholder="0.00" step="0.01"></div>
+            <div class="input-box">
+                <span class="placeholder-text" id="placeholder_text">여 기</span>
+                <input type="number" id="amount_input" step="0.01">
+            </div>
             <button class="btn-action btn-calc" onclick="calculateBilling()">계산</button>
         </div>
     </div>
@@ -636,8 +666,33 @@
         let trendActivePage = 0;
         let globalRenderedPoints = [];
 
-        const rateInput = document.getElementById("rate_input"), amountInput = document.getElementById("amount_input");
-        amountInput.addEventListener("keydown", function(e) { if (e.key === "Enter") { e.preventDefault(); calculateBilling(); this.blur(); } });
+        const rateInput = document.getElementById("rate_input");
+        const amountInput = document.getElementById("amount_input");
+        const placeholderText = document.getElementById("placeholder_text");
+        
+        // placeholder 표시/숨김 제어
+        amountInput.addEventListener("input", function() {
+            if (this.value.length > 0) {
+                placeholderText.classList.add("hidden");
+            } else {
+                placeholderText.classList.remove("hidden");
+            }
+        });
+        
+        // 포커스 해제 시에도 값이 없으면 placeholder 다시 표시
+        amountInput.addEventListener("blur", function() {
+            if (this.value.length === 0) {
+                placeholderText.classList.remove("hidden");
+            }
+        });
+        
+        amountInput.addEventListener("keydown", function(e) { 
+            if (e.key === "Enter") { 
+                e.preventDefault(); 
+                calculateBilling(); 
+                this.blur(); 
+            } 
+        });
         
         // ============================================================
         // 저장/복원
@@ -867,7 +922,7 @@
         }
 
         // ============================================================
-        // ★★★ 환율 가져오기 (오리지널 로직) ★★★
+        // 환율 가져오기 (오리지널 로직)
         // ============================================================
         function syncRateLoader() {
             const statusLbl = document.getElementById("status_lbl");
@@ -899,7 +954,7 @@
                 return;
             }
 
-            // ========== 1. TheMore API (주간/야간/주말 구분) ==========
+            // 1. TheMore API (주간/야간/주말 구분)
             const now = new Date();
             const day = now.getDay();
             const hour = now.getHours();
@@ -936,7 +991,7 @@
                 }, function(err) { runOpenErEngine("통신 장애 계산식", 1.0095); });
             }
 
-            // ========== 2. 공개 API (백업) ==========
+            // 2. 공개 API (백업)
             function runOpenErEngine(formulaLabel, feeMultiplier) {
                 cordova.plugin.http.sendRequest("https://open.er-api.com/v6/latest/USD", {
                     method: 'get', timeout: 2.5
@@ -957,7 +1012,7 @@
                 }, function(err) { runFinalStorageRecovery(); });
             }
 
-            // ========== 3. 내부저장소 (최후의 보루) ==========
+            // 3. 내부저장소 (최후의 보루)
             function runFinalStorageRecovery() {
                 const savedLastRate = localStorage.getItem("themore_last_usd_rate");
                 applyFinalRate(parseFloat(savedLastRate || 1350.00), "통신 장애 내부저장소 값", "기준: 기기 내부 저장소", "var(--accent-red)");
@@ -1081,6 +1136,8 @@
             saveAppState(); 
             renderHistory(); 
             amountInput.value = ""; 
+            // placeholder 다시 표시
+            placeholderText.classList.remove("hidden");
         }
         
         function renderHistory() { 
