@@ -63,6 +63,7 @@
         /* ===== 헤더 ===== */
         .header-bar { display: flex; justify-content: space-between; align-items: center; padding: 4px 10px; flex-shrink: 0; }
         .header-title { font-size: 17px !important; font-weight: 900; letter-spacing: -0.8px; background: linear-gradient(135deg, #ff65a3 0%, #a855f7 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        /* 앱 아이콘: loading.png 사용 */
         .header-logo { width: 28px !important; height: 28px !important; object-fit: cover; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 3px 10px rgba(0,0,0,0.5); }
         
         /* ===== 탭 ===== */
@@ -298,7 +299,8 @@
 
     <div class="header-bar premium-panel">
         <span class="header-title">The More for HJ</span>
-        <img src="icon.png" class="header-logo" alt="Logo">
+        <!-- 앱 아이콘: loading.png 사용 -->
+        <img src="loading.png" class="header-logo" alt="Logo">
     </div>
     
     <div class="tabs">
@@ -1293,4 +1295,4 @@
         window.addEventListener('DOMContentLoaded', () => { setTimeout(() => { if(typeof cordova === "undefined") initializeAppPipeline(); }, 600); });
     </script>
 </body>
-</html>
+                </html>
