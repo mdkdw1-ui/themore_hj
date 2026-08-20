@@ -65,9 +65,11 @@
         #time_lbl { color: var(--text-muted); white-space: nowrap; }
         .field-row { display: grid; grid-template-columns: 1fr 76px; gap: 6px; align-items: center; }
         
-        .input-box { display: flex; align-items: center; justify-content: center; background-color: var(--bg-input); border-radius: 8px; height: 40px; border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: inset 0 2px 6px rgba(0,0,0,0.7); overflow: hidden; }
-        .input-box input { width: 100%; background: transparent; border: none; outline: none; text-align: center; font-weight: bold; font-size: 16px; color: #ffffff; padding: 2px 0 0 0; }
-        /* readonly 제거 - 사용자가 수정 가능 */
+        .input-box { display: flex; align-items: center; justify-content: center; background-color: var(--bg-input); border-radius: 8px; height: 40px; border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: inset 0 2px 6px rgba(0,0,0,0.7); overflow: hidden; position: relative; }
+        .input-box input { width: 100%; background: transparent; border: none; outline: none; text-align: center; font-weight: bold; font-size: 16px; color: #ffffff; padding: 2px 0 0 0; position: relative; z-index: 2; }
+        .input-box .placeholder-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px; color: rgba(255, 255, 255, 0.2); pointer-events: none; z-index: 1; transition: opacity 0.2s ease; }
+        .input-box .placeholder-overlay.hidden { opacity: 0; }
+        
         #rate_input { color: var(--accent-green); }
         #amount_input { color: #e2e8f0; }
         
@@ -82,8 +84,8 @@
             justify-content: center; 
             align-items: center; 
             text-align: center; 
-            gap: 4px; 
-            padding: 12px 8px; 
+            gap: 2px; 
+            padding: 10px 8px; 
             background: linear-gradient(145deg, #161936 0%, #070812 100%); 
             border: 2px solid rgba(255, 77, 77, 0.35); 
             border-radius: 14px; 
@@ -100,7 +102,32 @@
         }
 
         #final_res { font-size: 26px; font-weight: bold; color: var(--accent-red); text-shadow: 0 0 16px rgba(255, 77, 77, 0.4); white-space: nowrap; letter-spacing: -0.5px; }
-        #buffer_res { font-size: 18px; font-weight: bold; color: #ff6b6b; white-space: nowrap; letter-spacing: -0.3px; }
+        #rate_info_line { 
+            font-size: 10px; 
+            color: var(--text-muted); 
+            margin-top: 1px; 
+            min-height: 16px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 4px; 
+            width: 100%; 
+            transition: all 0.2s ease;
+            flex-wrap: wrap;
+        }
+        #rate_info_line .manual-badge {
+            color: var(--accent-pink);
+            font-weight: 900;
+            font-size: 11px;
+        }
+        #rate_info_line .manual-rate {
+            color: var(--accent-green);
+            font-weight: bold;
+        }
+        #rate_info_line .real-rate {
+            color: var(--text-muted);
+            font-size: 9px;
+        }
         
         .guide-panel { padding: 8px 12px; display: flex; gap: 10px; align-items: center; }
         .guide-left-area { flex: 1.1; display: flex; flex-direction: column; min-width: 0; }
@@ -126,7 +153,6 @@
         .history-panel { display: flex; flex-direction: column; gap: 5px; flex: 1; min-height: 0; background: transparent; }
         .history-header { display: flex; justify-content: space-between; align-items: center; padding: 0 2px; flex-shrink: 0; }
         .history-panel h3 { font-size: 12px; color: #9ca3af; font-weight: bold; }
-        .history-subtext { font-size: 11px; color: var(--accent-pink); margin-left: auto; margin-right: 12px; font-weight: bold; } 
         .clear-btn { background: none; border: none; color: var(--text-muted); font-size: 12px; cursor: pointer; font-weight: bold; }
         
         .log-box { background: linear-gradient(145deg, var(--bg-panel-top) 0%, var(--bg-panel-bottom) 100%); border-radius: 12px; padding: 8px 12px; font-size: 13.5px; font-weight: bold; color: #4b5563; flex: 1; overflow-y: auto; white-space: pre-line; line-height: 1.55; border: var(--card-border); box-shadow: var(--panel-shadow); }
@@ -149,10 +175,10 @@
         body.large-font-mode .field-row { grid-template-columns: 1fr 90px; }
         body.large-font-mode .input-box { height: 48px; }
         body.large-font-mode .input-box input { font-size: 22px; }
+        body.large-font-mode .input-box .placeholder-overlay { font-size: 22px; }
         body.large-font-mode .btn-action { height: 48px; font-size: 18px; }
         body.large-font-mode .result-container { order: 5; padding: 8px; border: 3px solid var(--accent-red); }
         body.large-font-mode #final_res { font-size: 28px; } 
-        body.large-font-mode #buffer_res { font-size: 18px; }
         body.large-font-mode .history-panel { order: 6; flex: 1.4; min-height: 110px; }
         body.large-font-mode .history-header h3 { font-size: 15px; }
         body.large-font-mode .clear-btn { font-size: 14px; }
@@ -296,8 +322,10 @@
     <div class="panel premium-panel">
         <div class="api-info-row"><span id="status_lbl">환율 엔진 준비 중...</span><span id="time_lbl">기준시: 동기화 대기</span></div>
         <div class="field-row">
-            <!-- readonly 속성 제거됨 -->
-            <div class="input-box"><input type="text" id="rate_input"></div>
+            <div class="input-box">
+                <input type="text" id="rate_input">
+                <div class="placeholder-overlay" id="rate_placeholder"></div>
+            </div>
             <button class="btn-action btn-refresh" onclick="syncRateLoader(); event.stopPropagation();">갱신</button>
         </div>
         <div class="field-row">
@@ -308,13 +336,12 @@
     
     <div class="result-container">
         <div id="final_res">청구예정 : - 원</div>
-        <div id="buffer_res">~ - 원까지 고려</div>
+        <div id="rate_info_line"></div>
     </div>
     
     <div class="history-panel">
         <div class="history-header">
             <h3>내 최근 이용 기록</h3>
-            <span class="history-subtext" id="track_mode_lbl">환율 변동폭 3% 고려</span>
             <button class="clear-btn" onclick="clearHistory()">삭제</button>
         </div>
         <div id="history_box" class="log-box"></div>
@@ -440,7 +467,55 @@
         let trendActivePage = 0;
         let globalRenderedPoints = [];
 
-        const rateInput = document.getElementById("rate_input"), amountInput = document.getElementById("amount_input");
+        const rateInput = document.getElementById("rate_input");
+        const ratePlaceholder = document.getElementById("rate_placeholder");
+        const amountInput = document.getElementById("amount_input");
+        
+        // 🔥 rate_input 향상된 입력 처리
+        function setupRateInput() {
+            let originalValue = '';
+            
+            rateInput.addEventListener('focus', function() {
+                originalValue = this.value;
+                // placeholder에 원래 값 표시 (연하게)
+                ratePlaceholder.textContent = originalValue;
+                ratePlaceholder.classList.remove('hidden');
+                // 입력창 비우기 (사용자가 새로 입력할 수 있도록)
+                this.value = '';
+                this.style.color = '#ffffff';
+            });
+            
+            rateInput.addEventListener('blur', function() {
+                ratePlaceholder.classList.add('hidden');
+                // 아무것도 입력하지 않으면 원래 값 복원
+                if (this.value.trim() === '') {
+                    this.value = originalValue;
+                    this.style.color = 'var(--accent-green)';
+                }
+            });
+            
+            rateInput.addEventListener('input', function() {
+                // 숫자만 허용 (소수점 포함)
+                this.value = this.value.replace(/[^0-9.]/g, '');
+                // 입력 중일 때 placeholder 숨김
+                if (this.value.trim() !== '') {
+                    ratePlaceholder.classList.add('hidden');
+                    this.style.color = '#ffffff';
+                } else {
+                    ratePlaceholder.classList.remove('hidden');
+                }
+            });
+            
+            // 백스페이스로 전체 삭제 방지 (값이 있으면 유지)
+            rateInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Backspace' && this.value.length <= 1) {
+                    e.preventDefault();
+                    this.value = '';
+                    ratePlaceholder.classList.remove('hidden');
+                }
+            });
+        }
+        
         amountInput.addEventListener("keydown", function(e) { if (e.key === "Enter") { e.preventDefault(); calculateBilling(); this.blur(); } });
         
         function saveAppState() { const state = { currentTab, selectedCurrencyCode, selectedContinentCode, lastMainCurrency, lastSubContinent, lastSubCurrency, systemViewMode, historyLog }; localStorage.setItem("themore_v23_state", JSON.stringify(state)); }
@@ -456,7 +531,14 @@
         function renderContinentTop() { const container = document.getElementById("top_options"), trigger = document.getElementById("top_trigger"); container.innerHTML = ""; trigger.innerText = CONTINENTS[selectedContinentCode]; for (let code in CONTINENTS) { let div = document.createElement("div"); div.className = "option-item" + (code === selectedContinentCode ? " selected" : ""); div.innerText = CONTINENTS[code]; div.onclick = (e) => { e.stopPropagation(); selectedContinentCode = code; lastSubContinent = code; trigger.innerText = CONTINENTS[code]; document.getElementById("top_dropdown").classList.remove("active"); saveAppState(); updateSubCurrencyBottom(); }; container.appendChild(div); } }
         function updateSubCurrencyBottom() { const container = document.getElementById("bottom_options"), trigger = document.getElementById("bottom_trigger"); container.innerHTML = ""; let validList = []; for (let code in GLOBAL_CURRENCY_MAP) { const info = GLOBAL_CURRENCY_MAP[code]; if(info.isMajor) continue; if (selectedContinentCode === "ALL" || info.continent === selectedContinentCode) validList.push(info); } if (!validList.some(item => item.code === "USD") && validList.length > 0) { if (!validList.some(item => item.code === selectedCurrencyCode)) selectedCurrencyCode = validList[0].code; } lastSubCurrency = selectedCurrencyCode; if(GLOBAL_CURRENCY_MAP[selectedCurrencyCode]) trigger.innerText = `${GLOBAL_CURRENCY_MAP[selectedCurrencyCode].name} (${selectedCurrencyCode})`; validList.forEach(info => { let div = document.createElement("div"); div.className = "option-item" + (info.code === selectedCurrencyCode ? " selected" : ""); div.innerText = `${info.name} (${info.code})`; div.onclick = (e) => { e.stopPropagation(); selectedCurrencyCode = info.code; lastSubCurrency = info.code; trigger.innerText = `${info.name} (${info.code})`; document.getElementById("bottom_dropdown").classList.remove("active"); saveAppState(); extractRateFromActiveCache(); }; container.appendChild(div); }); extractRateFromActiveCache(); }
         
-        function updateVisualRateDisplay() { const info = getInfo(); if(!info) return; rateInput.value = `${rawNumericRate.toFixed(2)}원 (${info.rate_unit}${info.code})`; }
+        function updateVisualRateDisplay() { 
+            const info = getInfo(); 
+            if(!info) return; 
+            const displayText = `${rawNumericRate.toFixed(2)}원 (${info.rate_unit}${info.code})`;
+            rateInput.value = displayText;
+            ratePlaceholder.textContent = displayText;
+            ratePlaceholder.classList.add('hidden');
+        }
         
         function extractRateFromActiveCache() { 
             const info = getInfo(); 
@@ -799,7 +881,7 @@
 
         function closeGuidePopup() { document.getElementById("guide_modal").style.display = "none"; }
 
-        // 🔥 계산 함수 수정 - 사용자 입력 환율 우선 적용
+        // 🔥 계산 함수 - 3% 고려 제거, 임의 환율 표시
         function calculateBilling() {
             const amtInput = parseFloat(amountInput.value);
             if (isNaN(amtInput) || amtInput <= 0) {
@@ -807,15 +889,16 @@
                 return;
             }
 
-            // 1. 사용할 환율 결정 (사용자 입력 우선)
-            let currentRate = rawNumericRate; // 기본값은 엔진 값
+            // 사용할 환율 결정 (사용자 입력 우선)
+            let currentRate = rawNumericRate;
+            let isManualRate = false;
             const manualRateText = rateInput.value.trim();
 
             if (manualRateText !== "") {
-                // 숫자만 추출 (예: "900.00원 (100JPY)" -> 900.00)
                 const rateNumber = parseFloat(manualRateText.replace(/[^0-9.]/g, ''));
                 if (!isNaN(rateNumber) && rateNumber > 0) {
-                    currentRate = rateNumber; // 사용자 입력 값으로 교체
+                    currentRate = rateNumber;
+                    isManualRate = true;
                 }
             }
 
@@ -825,7 +908,7 @@
                 return;
             }
 
-            // currentRate를 사용하여 계산
+            // 계산
             let usdAmount = amtInput;
             if (info.code !== "USD") {
                 usdAmount = amtInput * (currentRate / info.rate_unit) / globalCachedUsdTt;
@@ -836,12 +919,34 @@
             const shinhanFee = Math.floor(krwAmount * 0.0018);
             const finalBillingKrw = krwAmount + shinhanFee;
 
-            document.getElementById("final_res").innerText = `청구예정 : ${finalBillingKrw.toLocaleString()} 원`;
-            const bufferedBillingKrw = Math.round(finalBillingKrw * 1.03);
-            document.getElementById("buffer_res").innerText = `~ ${bufferedBillingKrw.toLocaleString()} 원까지 고려`;
+            // 결과 표시 (임의 환율 여부에 따라)
+            const resultLine = document.getElementById("final_res");
+            const infoLine = document.getElementById("rate_info_line");
+            
+            if (isManualRate) {
+                resultLine.innerHTML = `🔄 청구예정 : ${finalBillingKrw.toLocaleString()} 원 ✏️`;
+                infoLine.innerHTML = `
+                    <span class="manual-badge">✏️ 수동환율</span>
+                    <span>|</span>
+                    <span class="manual-rate">${currentRate.toFixed(2)}원</span>
+                    <span style="color: var(--text-muted);">/</span>
+                    <span>${info.rate_unit}${info.code}</span>
+                    <span class="real-rate">(실제 ${rawNumericRate.toFixed(2)}원)</span>
+                `;
+            } else {
+                resultLine.innerHTML = `청구예정 : ${finalBillingKrw.toLocaleString()} 원`;
+                infoLine.innerHTML = `
+                    <span style="color: var(--text-muted);">✅ 실시간 환율</span>
+                    <span>|</span>
+                    <span style="color: var(--accent-green);">${currentRate.toFixed(2)}원</span>
+                    <span style="color: var(--text-muted);">/</span>
+                    <span style="color: var(--text-muted);">${info.rate_unit}${info.code}</span>
+                `;
+            }
 
-            // 히스토리 저장
-            const now = new Date(), timeStr = `${String(now.getMonth()+1).padStart(2,'0')} / ${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}시${String(now.getMinutes()).padStart(2,'0')}분`;
+            // 히스토리 저장 (3% 관련 정보 제거)
+            const now = new Date();
+            const timeStr = `${String(now.getMonth()+1).padStart(2,'0')} / ${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}시${String(now.getMinutes()).padStart(2,'0')}분`;
             let logInputStr = formatForeignAmount(amtInput, info);
 
             const logItem = {
@@ -849,7 +954,8 @@
                 inputAmt: logInputStr,
                 sym: info.symbol,
                 finalKrw: finalBillingKrw.toLocaleString(),
-                bufKrw: bufferedBillingKrw.toLocaleString()
+                isManual: isManualRate,
+                manualRate: isManualRate ? currentRate : null
             };
 
             historyLog.unshift(logItem);
@@ -869,11 +975,15 @@
             } 
             
             const lines = historyLog.map(item => {
-                if (typeof item === 'string') return item; 
+                if (typeof item === 'string') return item;
+                
+                const manualIcon = item.isManual ? ' ✏️' : '';
+                const rateInfo = item.isManual ? ` (수동 ${item.manualRate?.toFixed(2)}원)` : '';
+                
                 if (systemViewMode === "LARGE") {
-                    return `[${item.time}] ${item.inputAmt}${item.sym} = ${item.finalKrw}원`;
+                    return `[${item.time}] ${item.inputAmt}${item.sym} = ${item.finalKrw}원${manualIcon}`;
                 } else {
-                    return `[${item.time}] ${item.inputAmt}${item.sym} = ${item.finalKrw}원 (~${item.bufKrw}원)`;
+                    return `[${item.time}] ${item.inputAmt}${item.sym} = ${item.finalKrw}원${manualIcon}${rateInfo}`;
                 }
             });
             box.innerText = lines.join("\n"); 
@@ -1281,6 +1391,7 @@
             initTrendTouchEvents(); 
             syncRateLoader(); 
             launchSparkleEngine(); 
+            setupRateInput(); // 🔥 rate_input 향상된 입력 처리 적용
         }
         
         document.addEventListener('deviceready', () => { initializeAppPipeline(); }, false);
