@@ -978,7 +978,7 @@
                 if (typeof item === 'string') return item;
                 
                 const manualIcon = item.isManual ? ' ✏️' : '';
-                const rateInfo = item.isManual ? ` (수동 ${item.manualRate?.toFixed(2)}원)` : '';
+                const rateInfo = item.isManual ? ` ( ${item.manualRate?.toFixed(2)}원)` : '';
                 
                 if (systemViewMode === "LARGE") {
                     return `[${item.time}] ${item.inputAmt}${item.sym} = ${item.finalKrw}원${manualIcon}`;
