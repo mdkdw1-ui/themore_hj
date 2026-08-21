@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="search_keywords">
+        <item>더모아현주</item>
+        <item>더모어현주</item>
+        <item>더모아</item>
+        <item>현주</item>
+        <item>themore</item>
+        <item>the more</item>
+    </string-array>
+</resources>
