@@ -18,9 +18,12 @@
         <!-- 안드로이드 앱 아이콘 -->
         <icon src="icon.png" />
 
-        <!-- ⭐️ 검색어 키워드 추가 (더모아현주, 더모어현주) -->
-        <meta-data android:name="android.app.searchable" android:resource="@xml/searchable"/>
-        
+        <!-- ⭐️ AndroidManifest.xml에 meta-data 추가 (config-file 사용) -->
+        <config-file target="AndroidManifest.xml" parent="application">
+            <meta-data android:name="android.app.searchable" 
+                       android:resource="@xml/searchable"/>
+        </config-file>
+
         <!-- 스플래시 로고 -->
         <preference name="AndroidWindowSplashscreenAnimatedIcon" value="res/logo.png" />
         
