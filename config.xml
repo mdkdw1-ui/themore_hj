@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <widget id="com.hj.themore" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-    <name>The More for HJ</name>
+    <name>더모아현주 (The More for HJ)</name>
     <description>
         더모아현주 - 해외 결제 최적화 도우미 (The More for HJ)
+        검색어: 더모아현주, 더모어현주, themore
     </description>
     <author email="dev@cordova.apache.org" href="https://cordova.apache.org">
         Apache Cordova Team
@@ -11,26 +12,12 @@
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
     
-    <!-- 앱 아이콘 -->
     <icon src="icon.png" />
     
     <platform name="android">
-        <!-- 안드로이드 앱 아이콘 -->
         <icon src="icon.png" />
-
-        <!-- ⭐️ AndroidManifest.xml에 meta-data 추가 (config-file 사용) -->
-        <config-file target="AndroidManifest.xml" parent="application">
-            <meta-data android:name="android.app.searchable" 
-                       android:resource="@xml/searchable"/>
-        </config-file>
-
-        <!-- 스플래시 로고 -->
         <preference name="AndroidWindowSplashscreenAnimatedIcon" value="res/logo.png" />
-        
-        <!-- 로딩 화면 배경색 -->
         <preference name="AndroidWindowSplashscreenBackgroundColor" value="#0a0b16" />
-        
-        <!-- 스플래시 화면 제어 설정 -->
         <preference name="SplashScreen" value="screen" />
         <preference name="AutoHideSplashScreen" value="true" />
         <preference name="SplashScreenDelay" value="2000" />
