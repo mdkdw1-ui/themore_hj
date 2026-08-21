@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <widget id="com.hj.themore" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-    <name>더모아현주 (The More for HJ)</name>
+    <name>The More for HJ</name>
     <description>
         더모아현주 - 해외 결제 최적화 도우미 (The More for HJ)
         검색어: 더모아현주, 더모어현주, themore
@@ -16,6 +16,12 @@
     
     <platform name="android">
         <icon src="icon.png" />
+        
+        <!-- ⭐ 중요: 앱 라벨은 The More for HJ -->
+        <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application">
+            <application android:label="The More for HJ" />
+        </edit-config>
+        
         <preference name="AndroidWindowSplashscreenAnimatedIcon" value="res/logo.png" />
         <preference name="AndroidWindowSplashscreenBackgroundColor" value="#0a0b16" />
         <preference name="SplashScreen" value="screen" />
