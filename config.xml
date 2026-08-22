@@ -17,11 +17,6 @@
     <platform name="android">
         <icon src="icon.png" />
         
-        <!-- ⭐ 중요: 앱 라벨은 The More for HJ -->
-        <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application">
-            <application android:label="The More for HJ" />
-        </edit-config>
-        
         <preference name="AndroidWindowSplashscreenAnimatedIcon" value="res/logo.png" />
         <preference name="AndroidWindowSplashscreenBackgroundColor" value="#0a0b16" />
         <preference name="SplashScreen" value="screen" />
