@@ -3,7 +3,7 @@ name: Build Android APK
 on:
   push:
     branches: [ main, master ]
-  workflow_dispatch: # GitHub 웹페이지에서 수동으로 빌드 버튼을 누를 수 있게 합니다.
+  workflow_dispatch:
 
 jobs:
   build:
@@ -33,8 +33,49 @@ jobs:
     - name: Add Android Platform
       run: cordova platform add android
 
+    # ⭐ 추가: res/values/strings.xml 파일을 복사하여 안드로이드 리소스에 반영
+    - name: Copy strings.xml to Android resources
+      run: |
+        mkdir -p platforms/android/app/src/main/res/values
+        cp res/values/strings.xml platforms/android/app/src/main/res/values/strings.xml
+        echo "✅ strings.xml 복사 완료"
+
     - name: Build Android App (Debug APK)
       run: cordova build android --debug
+
+    # ⭐ 추가: 빌드 후 strings.xml 확인 및 수정 (안전장치)
+    - name: Verify and fix app name in strings.xml
+      run: |
+        if [ -f "platforms/android/app/src/main/res/values/strings.xml" ]; then
+          echo "📁 현재 strings.xml 내용:"
+          cat platforms/android/app/src/main/res/values/strings.xml
+          
+          # app_name이 "The More for HJ"인지 확인하고, 아니면 수정
+          if grep -q '<string name="app_name">The More for HJ</string>' platforms/android/app/src/main/res/values/strings.xml; then
+            echo "✅ 앱 이름이 정상적으로 설정되어 있습니다: The More for HJ"
+          else
+            echo "⚠️ 앱 이름이 다릅니다. 수정합니다..."
+            sed -i 's/<string name="app_name">.*<\/string>/<string name="app_name">The More for HJ<\/string>/g' platforms/android/app/src/main/res/values/strings.xml
+            echo "✅ 앱 이름을 'The More for HJ'로 수정했습니다."
+          fi
+          
+          # search_hint 확인
+          if grep -q 'search_hint' platforms/android/app/src/main/res/values/strings.xml; then
+            echo "✅ search_hint가 설정되어 있습니다."
+          else
+            echo "⚠️ search_hint가 없습니다. 추가합니다..."
+            echo '    <string name="search_hint">더모아현주, 더모어현주</string>' >> platforms/android/app/src/main/res/values/strings.xml
+            echo "✅ search_hint를 추가했습니다."
+          fi
+        fi
+
+    # ⭐ 추가: AndroidManifest.xml도 확인
+    - name: Verify AndroidManifest.xml
+      run: |
+        if [ -f "platforms/android/app/src/main/AndroidManifest.xml" ]; then
+          echo "📁 AndroidManifest.xml 확인:"
+          grep 'android:label' platforms/android/app/src/main/AndroidManifest.xml || echo "⚠️ android:label을 찾을 수 없습니다."
+        fi
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
@@ -46,5 +87,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: android-apk
-        # 경로를 조금 더 상위 폴더로 잡아서, 그 안에 있는 모든 apk를 다 가져오게 합니다.
         path: platforms/android/app/build/outputs/apk/**/*.apk
