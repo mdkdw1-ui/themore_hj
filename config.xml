@@ -1,26 +1,71 @@
-<?xml version="1.0" encoding="utf-8"?>
-<widget id="com.hj.themore" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-    <name>The More for HJ</name>
-    <description>
-        더모아현주 - 해외 결제 최적화 도우미 (The More for HJ)
-        검색어: 더모아현주, 더모어현주, themore
-    </description>
-    <author email="dev@cordova.apache.org" href="https://cordova.apache.org">
-        Apache Cordova Team
-    </author>
-    <content src="index.html" />
-    <allow-intent href="http://*/*" />
-    <allow-intent href="https://*/*" />
-    
-    <icon src="icon.png" />
-    
-    <platform name="android">
-        <icon src="icon.png" />
-        
-        <preference name="AndroidWindowSplashscreenAnimatedIcon" value="res/logo.png" />
-        <preference name="AndroidWindowSplashscreenBackgroundColor" value="#0a0b16" />
-        <preference name="SplashScreen" value="screen" />
-        <preference name="AutoHideSplashScreen" value="true" />
-        <preference name="SplashScreenDelay" value="2000" />
-    </platform>
-</widget>
+name: Build Android APK
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout source code
+      uses: actions/checkout@v4
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'zulu'
+        java-version: '17'
+
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install Cordova
+      run: npm install -g cordova
+
+    - name: Add Android Platform
+      run: cordova platform add android
+
+    # ⭐ 중요: strings.xml에서 app_name 중복 제거 (cdv_strings.xml과 충돌 방지)
+    - name: Fix strings.xml (remove duplicate app_name)
+      run: |
+        # res/values/strings.xml에서 app_name 라인 제거
+        if [ -f "res/values/strings.xml" ]; then
+          sed -i '/<string name="app_name">/d' res/values/strings.xml
+          echo "✅ strings.xml에서 app_name 제거됨"
+          cat res/values/strings.xml
+        fi
+
+    # ⭐ cdv_strings.xml을 우리가 원하는 내용으로 덮어쓰기
+    - name: Override cdv_strings.xml with correct app name
+      run: |
+        mkdir -p platforms/android/app/src/main/res/values
+        cat > platforms/android/app/src/main/res/values/cdv_strings.xml << 'EOF'
+        <?xml version='1.0' encoding='utf-8'?>
+        <resources>
+            <string name="app_name">The More for HJ</string>
+        </resources>
+        EOF
+        echo "✅ cdv_strings.xml 덮어쓰기 완료"
+
+    - name: Build Android App (Debug APK)
+      run: cordova build android --debug
+
+    - name: Upload APK Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: TheMore-HJ-APK
+        path: platforms/android/app/build/outputs/apk/debug/app-debug.apk
+
+    - name: 생성된 APK 파일 저장하기
+      uses: actions/upload-artifact@v4
+      with:
+        name: android-apk
+        path: platforms/android/app/build/outputs/apk/**/*.apk
